@@ -1,0 +1,27 @@
+Parametros de la ejecucion
+========================================
+N                         = 32
+num_modules               = 2
+n_aristas                 = 1
+p_intra                   = 1.0
+sigma                     = 1.0
+dt                        = 0.001
+num_K                     = 80
+K_min                     = 0.005
+K_max                     = 100.0
+K_center                  = None
+width_factor              = 0.5
+t_max_base                = 300.0
+t_max_peak                = 1500.0
+num_runs                  = 1
+methods                   = ['euler']
+n_jobs                    = 16
+distribucion_K            = logspace
+ICs_pareadas              = True
+A_pareada_por_run         = True
+Frustracion_Sync          = True
+Frustracion_Temp          = True
+K_list_temp               = [0.03, 0.5, 5.0, 30.0, 100.0]
+t_max_temp                = 500.0
+seed_temp                 = 42
+method_temp               = rk4

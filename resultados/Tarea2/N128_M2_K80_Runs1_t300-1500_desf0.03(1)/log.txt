@@ -1,0 +1,74 @@
+Log de ejecucion - 2026-05-05 10:43:45
+============================================================
+
+Carpeta de resultados: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K80_Runs1_t300-1500_desf0.03(1)
+Log de salida:         C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K80_Runs1_t300-1500_desf0.03(1)\log.txt
+
+K en [0.005, 100](logspace)
+t_max(K) en [300, 300] u.t.
+
+
+############################################################
+#  MODO SYNC: barrido completo en K
+############################################################
+Generando ICs y matrices de adyacencia (una por run)...
+  Guardadas en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K80_Runs1_t300-1500_desf0.03(1)\sync\condiciones_iniciales.npz
+  Heatmap A (run 0): C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K80_Runs1_t300-1500_desf0.03(1)\sync\A_run0.png
+  Densidades por bloque (run 0):
+[[1.00000000e+00 2.44140625e-04]
+ [2.44140625e-04 1.00000000e+00]]
+
+
+============================================================
+  BARRIDO con metodo: EULER
+============================================================
+Barrido [EULER]: 80 K x 1 runs = 80 simulaciones
+  Total simulado: 24000 u.t. (2.40e+07 pasos)
+  Workers (n_jobs): 12
+
+Lanzando 80 simulaciones en paralelo...
+[Parallel(n_jobs=12)]: Using backend LokyBackend with 12 concurrent workers.
+[Parallel(n_jobs=12)]: Done   1 tasks      | elapsed:   47.8s
+[Parallel(n_jobs=12)]: Done   8 tasks      | elapsed:   49.0s
+[Parallel(n_jobs=12)]: Done  17 tasks      | elapsed:  1.5min
+[Parallel(n_jobs=12)]: Done  26 tasks      | elapsed:  2.2min
+[Parallel(n_jobs=12)]: Done  37 tasks      | elapsed:  2.9min
+[Parallel(n_jobs=12)]: Done  48 tasks      | elapsed:  3.0min
+[Parallel(n_jobs=12)]: Done  66 out of  80 | elapsed:  4.2min remaining:   53.1s
+[Parallel(n_jobs=12)]: Done  75 out of  80 | elapsed:  4.9min remaining:   19.4s
+[Parallel(n_jobs=12)]: Done  80 out of  80 | elapsed:  5.1min finished
+  Tiempo barrido [euler]: 5.1 min
+
+  ------------------------------------------------------------
+  [EULER]
+    Modulo |  Kc experimental |    <sigma_r>
+    global |            0.201 |      0.13386
+         1 |            80.77 |      0.03209
+         2 |            80.79 |      0.03263
+
+############################################################
+#  MODO TEMP: evolucion temporal con ICs fijas
+############################################################
+Generando ICs y A fijas (seed=42)...
+  Guardadas en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K80_Runs1_t300-1500_desf0.03(1)\temporal\condiciones_iniciales_temp.npz
+  Heatmap A: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K80_Runs1_t300-1500_desf0.03(1)\temporal\A_temp.png
+  Densidades por bloque:
+[[1.00000000e+00 2.44140625e-04]
+ [2.44140625e-04 1.00000000e+00]]
+
+Modo TEMP: simulando 8 valores de K con metodo RK4...
+  [1/8] K=0.005  <R>=0.634  sigma_R=0.307  (183.9s)
+  [2/8] K=0.15  <R>=0.637  sigma_R=0.309  (189.9s)
+  [3/8] K=0.5  <R>=0.616  sigma_R=0.306  (194.8s)
+  [4/8] K=2.5  <R>=0.974  sigma_R=0.000  (176.3s)
+  [5/8] K=10  <R>=0.998  sigma_R=0.000  (121.0s)
+  [6/8] K=20  <R>=1.000  sigma_R=0.000  (101.7s)
+  [7/8] K=55  <R>=0.992  sigma_R=0.004  (107.1s)
+  [8/8] K=100  <R>=0.519  sigma_R=0.200  (136.6s)
+  Tiempo total simulaciones TEMP: 20.19 min
+  Series guardadas: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K80_Runs1_t300-1500_desf0.03(1)\temporal\series_temporales.npz
+  Plot: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K80_Runs1_t300-1500_desf0.03(1)\temporal\evolucion_temporal.png
+
+Tiempo total de ejecucion: 25.4 min (1526.0 s)
+
+Listo. Resultados en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K80_Runs1_t300-1500_desf0.03(1)

@@ -1,0 +1,70 @@
+Log de ejecucion - 2026-05-04 23:08:18
+============================================================
+
+Carpeta de resultados: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N32_M2_K80_Runs1_t300-1500_desf0.03
+Log de salida:         C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N32_M2_K80_Runs1_t300-1500_desf0.03\log.txt
+
+K en [0.005, 100](logspace)
+t_max(K) en [300, 300] u.t.
+
+
+############################################################
+#  MODO SYNC: barrido completo en K
+############################################################
+Generando ICs y matrices de adyacencia (una por run)...
+  Guardadas en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N32_M2_K80_Runs1_t300-1500_desf0.03\sync\condiciones_iniciales.npz
+  Heatmap A (run 0): C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N32_M2_K80_Runs1_t300-1500_desf0.03\sync\A_run0.png
+  Densidades por bloque (run 0):
+[[1.         0.00390625]
+ [0.00390625 1.        ]]
+
+
+============================================================
+  BARRIDO con metodo: EULER
+============================================================
+Barrido [EULER]: 80 K x 1 runs = 80 simulaciones
+  Total simulado: 24000 u.t. (2.40e+07 pasos)
+  Workers (n_jobs): 16
+
+Lanzando 80 simulaciones en paralelo...
+[Parallel(n_jobs=16)]: Using backend LokyBackend with 16 concurrent workers.
+[Parallel(n_jobs=16)]: Done   9 tasks      | elapsed:    5.7s
+[Parallel(n_jobs=16)]: Done  18 tasks      | elapsed:    8.7s
+[Parallel(n_jobs=16)]: Done  29 tasks      | elapsed:    9.0s
+[Parallel(n_jobs=16)]: Done  40 tasks      | elapsed:   11.5s
+[Parallel(n_jobs=16)]: Done  58 out of  80 | elapsed:   13.8s remaining:    5.2s
+[Parallel(n_jobs=16)]: Done  67 out of  80 | elapsed:   15.8s remaining:    3.0s
+[Parallel(n_jobs=16)]: Done  76 out of  80 | elapsed:   16.2s remaining:    0.8s
+[Parallel(n_jobs=16)]: Done  80 out of  80 | elapsed:   16.2s finished
+  Tiempo barrido [euler]: 0.3 min
+
+  ------------------------------------------------------------
+  [EULER]
+    Modulo |  Kc experimental |    <sigma_r>
+    global |           0.2951 |      0.11096
+         1 |          0.02937 |      0.03883
+         2 |          0.05799 |      0.04040
+
+############################################################
+#  MODO TEMP: evolucion temporal con ICs fijas
+############################################################
+Generando ICs y A fijas (seed=42)...
+  Guardadas en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N32_M2_K80_Runs1_t300-1500_desf0.03\temporal\condiciones_iniciales_temp.npz
+  Heatmap A: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N32_M2_K80_Runs1_t300-1500_desf0.03\temporal\A_temp.png
+  Densidades por bloque:
+[[1.         0.00390625]
+ [0.00390625 1.        ]]
+
+Modo TEMP: simulando 5 valores de K con metodo RK4...
+  [1/5] K=0.03  <R>=0.582  sigma_R=0.302  (10.5s)
+  [2/5] K=0.5  <R>=0.965  sigma_R=0.000  (7.7s)
+  [3/5] K=5  <R>=1.000  sigma_R=0.000  (7.7s)
+  [4/5] K=30  <R>=1.000  sigma_R=0.000  (7.7s)
+  [5/5] K=100  <R>=1.000  sigma_R=0.000  (7.6s)
+  Tiempo total simulaciones TEMP: 0.69 min
+  Series guardadas: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N32_M2_K80_Runs1_t300-1500_desf0.03\temporal\series_temporales.npz
+  Plot: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N32_M2_K80_Runs1_t300-1500_desf0.03\temporal\evolucion_temporal.png
+
+Tiempo total de ejecucion: 1.0 min (62.9 s)
+
+Listo. Resultados en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N32_M2_K80_Runs1_t300-1500_desf0.03

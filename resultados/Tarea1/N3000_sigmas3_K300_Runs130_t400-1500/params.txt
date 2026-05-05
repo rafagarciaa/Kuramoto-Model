@@ -1,0 +1,18 @@
+Parametros de la ejecucion
+========================================
+N                         = 3000
+dt                        = 0.025
+t_max_base                = 400.0
+t_max_peak                = 1500.0
+num_K                     = 300
+num_sigmas                = 3
+num_runs                  = 130
+width_factor              = 0.3
+n_fine                    = 10000
+K_min                     = 0.25
+K_max                     = 4.0
+sigma_min                 = 0.5
+sigma_max                 = 1.5
+sigma_values              = [np.float64(0.5), np.float64(1.0), np.float64(1.5)]
+ICs_pareadas              = True
+t_max_adaptativo          = t-Student (misma densidad que K-points)

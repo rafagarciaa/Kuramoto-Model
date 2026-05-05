@@ -1,0 +1,66 @@
+Log de ejecucion - 2026-05-05 12:14:23
+============================================================
+
+Carpeta de resultados: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K10_Runs50_t300-1500_desf0.03
+Log de salida:         C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K10_Runs50_t300-1500_desf0.03\log.txt
+
+K en [0.005, 1.24e+05](logspace)
+t_max(K) en [300, 300] u.t.
+
+
+############################################################
+#  MODO SYNC: barrido completo en K
+############################################################
+Generando ICs y matrices de adyacencia (una por run)...
+  Guardadas en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K10_Runs50_t300-1500_desf0.03\sync\condiciones_iniciales.npz
+  Heatmap A (run 0): C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K10_Runs50_t300-1500_desf0.03\sync\A_run0.png
+  Densidades por bloque (run 0):
+[[1.00000000e+00 2.44140625e-04]
+ [2.44140625e-04 1.00000000e+00]]
+
+
+============================================================
+  BARRIDO con metodo: EULER
+============================================================
+Barrido [EULER]: 10 K x 50 runs = 500 simulaciones
+  Total simulado: 150000 u.t. (1.50e+08 pasos)
+  Workers (n_jobs): 16
+
+Lanzando 500 simulaciones en paralelo...
+[Parallel(n_jobs=16)]: Using backend LokyBackend with 16 concurrent workers.
+[Parallel(n_jobs=16)]: Done   9 tasks      | elapsed:   48.6s
+[Parallel(n_jobs=16)]: Done  18 tasks      | elapsed:  1.6min
+[Parallel(n_jobs=16)]: Done  29 tasks      | elapsed:  1.6min
+[Parallel(n_jobs=16)]: Done  40 tasks      | elapsed:  2.4min
+[Parallel(n_jobs=16)]: Done  53 tasks      | elapsed:  3.0min
+[Parallel(n_jobs=16)]: Done  66 tasks      | elapsed:  3.7min
+[Parallel(n_jobs=16)]: Done  81 tasks      | elapsed:  4.4min
+[Parallel(n_jobs=16)]: Done  96 tasks      | elapsed:  4.6min
+[Parallel(n_jobs=16)]: Done 113 tasks      | elapsed:  5.6min
+[Parallel(n_jobs=16)]: Done 130 tasks      | elapsed:  6.3min
+[Parallel(n_jobs=16)]: Done 149 tasks      | elapsed:  7.0min
+[Parallel(n_jobs=16)]: Done 168 tasks      | elapsed:  7.6min
+[Parallel(n_jobs=16)]: Done 189 tasks      | elapsed:  8.3min
+[Parallel(n_jobs=16)]: Done 210 tasks      | elapsed:  9.3min
+[Parallel(n_jobs=16)]: Done 233 tasks      | elapsed: 10.0min
+[Parallel(n_jobs=16)]: Done 256 tasks      | elapsed: 10.9min
+[Parallel(n_jobs=16)]: Done 281 tasks      | elapsed: 12.1min
+[Parallel(n_jobs=16)]: Done 306 tasks      | elapsed: 13.5min
+[Parallel(n_jobs=16)]: Done 333 tasks      | elapsed: 15.1min
+[Parallel(n_jobs=16)]: Done 360 tasks      | elapsed: 16.9min
+[Parallel(n_jobs=16)]: Done 389 tasks      | elapsed: 19.2min
+[Parallel(n_jobs=16)]: Done 418 tasks      | elapsed: 21.3min
+[Parallel(n_jobs=16)]: Done 449 tasks      | elapsed: 23.6min
+[Parallel(n_jobs=16)]: Done 500 out of 500 | elapsed: 26.8min finished
+  Tiempo barrido [euler]: 26.8 min
+
+  ------------------------------------------------------------
+  [EULER]
+    Modulo |  Kc experimental |    <sigma_r>
+    global |           0.5474 |      0.12748
+         1 |            257.8 |      0.07091
+         2 |            257.9 |      0.07085
+
+Tiempo total de ejecucion: 26.8 min (1607.2 s)
+
+Listo. Resultados en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K10_Runs50_t300-1500_desf0.03

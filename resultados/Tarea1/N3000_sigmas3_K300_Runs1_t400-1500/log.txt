@@ -1,0 +1,71 @@
+Log de ejecucion - 2026-05-02 12:43:30
+============================================================
+
+Carpeta de resultados: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea1\N3000_sigmas3_K300_Runs1_t400-1500
+Log de salida:         C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea1\N3000_sigmas3_K300_Runs1_t400-1500\log.txt
+
+Generando condiciones iniciales pareadas (Common Random Numbers)...
+  Guardadas en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea1\N3000_sigmas3_K300_Runs1_t400-1500\condiciones_iniciales.npz
+
+Barrido: 3 sigmas x 300 K x 1 runs = 900 simulaciones
+
+Asignacion de t_max(K) (perfil t-Student, misma densidad que K-points):
+  t_max_base = 400 u.t.   t_max_peak = 1500 u.t.   width_factor = 0.3 (compartido con K_values)
+  sigma=0.50: t_max in [401, 1500] u.t., <t_max>=1095, suma=328474 u.t.
+  sigma=1.00: t_max in [422, 1500] u.t., <t_max>=1094, suma=328085 u.t.
+  sigma=1.50: t_max in [486, 1500] u.t., <t_max>=1131, suma=339250 u.t.
+  Total simulado (todas las tareas): 995809 u.t. (3.98e+07 pasos)
+
+Lanzando 900 simulaciones en paralelo (ordenadas por t_max desc)...
+[Parallel(n_jobs=-1)]: Using backend LokyBackend with 16 concurrent workers.
+[Parallel(n_jobs=-1)]: Done   9 tasks      | elapsed:    7.6s
+[Parallel(n_jobs=-1)]: Done  18 tasks      | elapsed:   12.8s
+[Parallel(n_jobs=-1)]: Done  29 tasks      | elapsed:   13.7s
+[Parallel(n_jobs=-1)]: Done  40 tasks      | elapsed:   19.0s
+[Parallel(n_jobs=-1)]: Done  53 tasks      | elapsed:   24.2s
+[Parallel(n_jobs=-1)]: Done  66 tasks      | elapsed:   29.7s
+[Parallel(n_jobs=-1)]: Done  81 tasks      | elapsed:   34.3s
+[Parallel(n_jobs=-1)]: Done  96 tasks      | elapsed:   37.1s
+[Parallel(n_jobs=-1)]: Done 113 tasks      | elapsed:   45.5s
+[Parallel(n_jobs=-1)]: Done 130 tasks      | elapsed:   50.8s
+[Parallel(n_jobs=-1)]: Done 149 tasks      | elapsed:   57.2s
+[Parallel(n_jobs=-1)]: Done 168 tasks      | elapsed:  1.1min
+[Parallel(n_jobs=-1)]: Done 189 tasks      | elapsed:  1.2min
+[Parallel(n_jobs=-1)]: Done 210 tasks      | elapsed:  1.3min
+[Parallel(n_jobs=-1)]: Done 233 tasks      | elapsed:  1.4min
+[Parallel(n_jobs=-1)]: Done 256 tasks      | elapsed:  1.5min
+[Parallel(n_jobs=-1)]: Done 281 tasks      | elapsed:  1.7min
+[Parallel(n_jobs=-1)]: Done 306 tasks      | elapsed:  1.8min
+[Parallel(n_jobs=-1)]: Done 333 tasks      | elapsed:  1.9min
+[Parallel(n_jobs=-1)]: Done 360 tasks      | elapsed:  2.0min
+[Parallel(n_jobs=-1)]: Done 389 tasks      | elapsed:  2.2min
+[Parallel(n_jobs=-1)]: Done 418 tasks      | elapsed:  2.3min
+[Parallel(n_jobs=-1)]: Done 449 tasks      | elapsed:  2.4min
+[Parallel(n_jobs=-1)]: Done 480 tasks      | elapsed:  2.6min
+[Parallel(n_jobs=-1)]: Done 513 tasks      | elapsed:  2.7min
+[Parallel(n_jobs=-1)]: Done 546 tasks      | elapsed:  2.8min
+[Parallel(n_jobs=-1)]: Done 581 tasks      | elapsed:  3.0min
+[Parallel(n_jobs=-1)]: Done 616 tasks      | elapsed:  3.1min
+[Parallel(n_jobs=-1)]: Done 653 tasks      | elapsed:  3.2min
+[Parallel(n_jobs=-1)]: Done 690 tasks      | elapsed:  3.3min
+[Parallel(n_jobs=-1)]: Done 729 tasks      | elapsed:  3.4min
+[Parallel(n_jobs=-1)]: Done 768 tasks      | elapsed:  3.5min
+[Parallel(n_jobs=-1)]: Done 809 tasks      | elapsed:  3.6min
+[Parallel(n_jobs=-1)]: Done 850 tasks      | elapsed:  3.7min
+[Parallel(n_jobs=-1)]: Done 900 out of 900 | elapsed:  3.8min finished
+
+============================================================
+ sigma |  Kc teorica | Kc experimental | <sigma(R_mean)>
+------------------------------------------------------------
+  0.50 |      0.7979 |          0.8234 |      0.00000
+  1.00 |      1.5958 |          1.4739 |      0.00000
+  1.50 |      2.3937 |          2.4762 |      0.00000
+============================================================
+
+<sigma(R_mean)> global = 0.00000
+
+============================================================
+Listo. Resultados en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea1\N3000_sigmas3_K300_Runs1_t400-1500
+============================================================
+
+Tiempo total de ejecucion: 3.8 min (226.4 s)

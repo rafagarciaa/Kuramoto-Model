@@ -1,0 +1,30 @@
+Log de ejecucion - 2026-05-05 10:43:37
+============================================================
+
+Carpeta de resultados: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K80_Runs1_t300-1500_desf0.03
+Log de salida:         C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K80_Runs1_t300-1500_desf0.03\log.txt
+
+K en [0.005, 100](logspace)
+t_max(K) en [300, 300] u.t.
+
+
+############################################################
+#  MODO SYNC: barrido completo en K
+############################################################
+Generando ICs y matrices de adyacencia (una por run)...
+  Guardadas en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K80_Runs1_t300-1500_desf0.03\sync\condiciones_iniciales.npz
+  Heatmap A (run 0): C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N128_M2_K80_Runs1_t300-1500_desf0.03\sync\A_run0.png
+  Densidades por bloque (run 0):
+[[1.00000000e+00 2.44140625e-04]
+ [2.44140625e-04 1.00000000e+00]]
+
+
+============================================================
+  BARRIDO con metodo: EULER
+============================================================
+Barrido [EULER]: 80 K x 1 runs = 80 simulaciones
+  Total simulado: 24000 u.t. (2.40e+07 pasos)
+  Workers (n_jobs): 12
+
+Lanzando 80 simulaciones en paralelo...
+[Parallel(n_jobs=12)]: Using backend LokyBackend with 12 concurrent workers.
