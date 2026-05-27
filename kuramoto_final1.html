@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Simulador - Kuramoto Nodo Puente</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        h2 {
+            text-align: center;
+            font-size: 20px;
+            margin: 0 0 15px 0;
+            max-width: 100%;
+        }
+        .controls {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+            background: #16213e;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 1100px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            box-sizing: border-box;
+        }
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .slider-group label {
+            font-size: 14px;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        .slider-group input[type="range"] {
+            width: 180px;
+            cursor: pointer;
+        }
+        canvas {
+            background: #0f3460;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 1100px;
+        }
+        .col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .legend {
+            display: flex;
+            gap: 15px;
+            margin-top: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .leg-global { color: #00ffcc; }
+        .leg-mod1 { color: #ff4757; }
+        .leg-mod2 { color: #1e90ff; }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            background: #e94560;
+            color: white;
+            font-weight: bold;
+            height: 40px;
+        }
+
+        /* --- MODO MÓVIL --- */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            h2 {
+                font-size: 15px;
+                margin-bottom: 12px;
+                line-height: 1.3;
+            }
+            .controls {
+                flex-direction: column;
+                gap: 14px;
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            .slider-group {
+                width: 100%;
+            }
+            .slider-group input[type="range"] {
+                width: 100%;
+                height: 28px; /* mejor target táctil */
+            }
+            .container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .col {
+                width: 100%;
+            }
+            .col canvas {
+                width: 100%;
+            }
+            button {
+                width: 100%;
+            }
+            .legend {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Módulos Completos con Enlaces Puente Variables (p_in=1.0)</h2>
+
+    <div class="controls">
+        <div class="slider-group">
+            <label for="kSlider">Acoplamiento Global (K): <span id="kValue">4.00</span></label>
+            <input type="range" id="kSlider" min="0" max="75" step="0.1" value="4">
+        </div>
+        <div class="slider-group">
+            <label for="dispSlider">Dispersión Frec. (σ): <span id="dispValue">0.40</span></label>
+            <input type="range" id="dispSlider" min="0" max="2" step="0.05" value="0.4">
+        </div>
+        <div class="slider-group">
+            <label for="offsetSlider">Desfase Mod 2 (Δω): <span id="offsetValue">0.00</span></label>
+            <input type="range" id="offsetSlider" min="-1" max="1" step="0.05" value="0">
+        </div>
+        <div class="slider-group">
+            <label for="bridgeSlider">Enlaces Puente: <span id="bridgeValue">1</span></label>
+            <input type="range" id="bridgeSlider" min="0" max="10" step="1" value="1">
+        </div>
+        <button onclick="reset()">Reiniciar Fases</button>
+    </div>
+
+    <div class="container">
+        <div class="col">
+            <canvas id="phaseCanvas" width="350" height="350"></canvas>
+            <div class="legend">Espacio de Fases</div>
+        </div>
+        <div class="col">
+            <canvas id="plotCanvas" width="350" height="350"></canvas>
+            <div class="legend">
+                <span class="leg-global">R</span> |
+                <span class="leg-mod1">r₁</span> |
+                <span class="leg-mod2">r₂</span>
+            </div>
+        </div>
+        <div class="col">
+            <canvas id="adjCanvas" width="250" height="250"></canvas>
+            <div class="legend">Matriz de Adyacencia (A_ij)</div>
+        </div>
+    </div>
+
+    <script>
+        const adjCtx = document.getElementById('adjCanvas').getContext('2d');
+        const phaseCtx = document.getElementById('phaseCanvas').getContext('2d');
+        const plotCtx = document.getElementById('plotCanvas').getContext('2d');
+
+        const N_per_mod = 100;
+        const N = N_per_mod * 2;
+
+        let p = [];
+        let w = [];
+        let A = [];
+
+        let K = 4.0;
+        let sigma = 0.4;
+        let deltaOmega = 0.0;
+        let nBridges = 1;  // Número de enlaces intermodulares
+        const dt = 0.05;
+
+        const historyLength = 350;
+        let R_hist = new Array(historyLength).fill(0);
+        let r1_hist = new Array(historyLength).fill(0);
+        let r2_hist = new Array(historyLength).fill(0);
+
+        function randomGaussian(mean=0, stdev=1) {
+            let u = 1 - Math.random();
+            let v = Math.random();
+            return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v) * stdev + mean;
+        }
+
+        // Módulo 1: media 0. Módulo 2: media deltaOmega.
+        function generateFrequencies() {
+            w = [];
+            for(let i = 0; i < N; i++) {
+                let mean = (i < N_per_mod) ? 0 : deltaOmega;
+                w.push(randomGaussian(mean, sigma));
+            }
+        }
+
+        function generateDeterministicNetwork() {
+            A = Array(N).fill(0).map(() => Array(N).fill(0));
+
+            for(let i = 0; i < N_per_mod; i++) {
+                for(let j = 0; j < N_per_mod; j++) {
+                    if(i !== j) A[i][j] = 1;
+                }
+            }
+            for(let i = N_per_mod; i < N; i++) {
+                for(let j = N_per_mod; j < N; j++) {
+                    if(i !== j) A[i][j] = 1;
+                }
+            }
+            // nBridges enlaces puente entre pares (k, N_per_mod+k) para k = 0..nBridges-1
+            for(let k = 0; k < nBridges; k++) {
+                A[k][N_per_mod + k] = 1;
+                A[N_per_mod + k][k] = 1;
+            }
+
+            drawAdjacencyMatrix();
+        }
+
+        // Útil para diferenciar enlaces y nodos puente al dibujar
+        function isBridgeEdge(i, j) {
+            const a = Math.min(i, j), b = Math.max(i, j);
+            return a < nBridges && b === N_per_mod + a;
+        }
+        function isBridgeNode(i) {
+            return (i < nBridges) || (i >= N_per_mod && i < N_per_mod + nBridges);
+        }
+
+        function init() {
+            p = [];
+            for(let i = 0; i < N; i++) {
+                p.push(Math.random() * 2 * Math.PI);
+            }
+            generateFrequencies();
+            generateDeterministicNetwork();
+        }
+
+        document.getElementById('kSlider').oninput = function() {
+            K = parseFloat(this.value);
+            document.getElementById('kValue').innerText = K.toFixed(2);
+        }
+        document.getElementById('dispSlider').oninput = function() {
+            document.getElementById('dispValue').innerText = parseFloat(this.value).toFixed(2);
+        }
+        document.getElementById('dispSlider').onchange = function() {
+            sigma = parseFloat(this.value);
+            generateFrequencies();
+        }
+        document.getElementById('offsetSlider').oninput = function() {
+            document.getElementById('offsetValue').innerText = parseFloat(this.value).toFixed(2);
+        }
+        document.getElementById('offsetSlider').onchange = function() {
+            deltaOmega = parseFloat(this.value);
+            generateFrequencies();
+        }
+        // Enlaces puente: regeneramos la red en tiempo real, sin tocar fases ni frecuencias
+        document.getElementById('bridgeSlider').oninput = function() {
+            nBridges = parseInt(this.value);
+            document.getElementById('bridgeValue').innerText = nBridges;
+            generateDeterministicNetwork();
+        }
+
+        function reset() { init(); }
+
+        function getLocalOrder(start, end) {
+            let sC = 0, sS = 0;
+            for(let i = start; i < end; i++) {
+                sC += Math.cos(p[i]);
+                sS += Math.sin(p[i]);
+            }
+            let len = end - start;
+            return { r: Math.sqrt(sC*sC + sS*sS) / len, psi: Math.atan2(sS, sC), c: sC, s: sS };
+        }
+
+        function update() {
+            let dp = new Array(N).fill(0);
+            for(let i = 0; i < N; i++) {
+                let sumInteraction = 0;
+                for(let j = 0; j < N; j++) {
+                    if(A[i][j] === 1) {
+                        sumInteraction += Math.sin(p[j] - p[i]);
+                    }
+                }
+                dp[i] = w[i] + (K / N) * sumInteraction;
+            }
+            for(let i = 0; i < N; i++) {
+                p[i] = (p[i] + dp[i] * dt + 2 * Math.PI) % (2 * Math.PI);
+            }
+
+            let op1 = getLocalOrder(0, N_per_mod);
+            let op2 = getLocalOrder(N_per_mod, N);
+
+            let sumCosG = op1.c + op2.c;
+            let sumSinG = op1.s + op2.s;
+            let R = Math.sqrt(sumCosG*sumCosG + sumSinG*sumSinG) / N;
+            let Psi = Math.atan2(sumSinG, sumCosG);
+
+            R_hist.push(R); R_hist.shift();
+            r1_hist.push(op1.r); r1_hist.shift();
+            r2_hist.push(op2.r); r2_hist.shift();
+
+            draw(R, Psi, op1, op2);
+            requestAnimationFrame(update);
+        }
+
+        function drawAdjacencyMatrix() {
+            adjCtx.fillStyle = '#16213e';
+            adjCtx.fillRect(0, 0, 250, 250);
+            let cellSize = 250 / N;
+
+            for(let i = 0; i < N; i++) {
+                for(let j = 0; j < N; j++) {
+                    if(A[i][j] === 1) {
+                        if(isBridgeEdge(i, j)) {
+                            adjCtx.fillStyle = '#ffffff';
+                            adjCtx.fillRect(j * cellSize - 1, i * cellSize - 1, cellSize + 2, cellSize + 2);
+                        } else {
+                            adjCtx.fillStyle = '#00ffcc';
+                            adjCtx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                        }
+                    }
+                }
+            }
+        }
+
+        function draw(R, Psi, op1, op2) {
+            phaseCtx.clearRect(0, 0, 350, 350);
+            plotCtx.clearRect(0, 0, 350, 350);
+
+            const cx = 175, cy = 175, rad = 130;
+            phaseCtx.beginPath(); phaseCtx.arc(cx, cy, rad, 0, 2*Math.PI);
+            phaseCtx.strokeStyle = 'rgba(255,255,255,0.2)'; phaseCtx.stroke();
+
+            for(let i=0; i<N; i++) {
+                if(isBridgeNode(i)) {
+                    phaseCtx.fillStyle = '#ffffff';
+                    phaseCtx.beginPath(); phaseCtx.arc(cx + rad*Math.cos(p[i]), cy + rad*Math.sin(p[i]), 5, 0, 2*Math.PI); phaseCtx.fill();
+                } else {
+                    phaseCtx.fillStyle = (i < N_per_mod) ? '#ff4757' : '#1e90ff';
+                    phaseCtx.beginPath(); phaseCtx.arc(cx + rad*Math.cos(p[i]), cy + rad*Math.sin(p[i]), 2.5, 0, 2*Math.PI); phaseCtx.fill();
+                }
+            }
+
+            // Líneas tenues entre cada par de nodos puente
+            phaseCtx.strokeStyle = 'rgba(255,255,255,0.15)';
+            phaseCtx.lineWidth = 1;
+            for(let k = 0; k < nBridges; k++) {
+                phaseCtx.beginPath();
+                phaseCtx.moveTo(cx + rad*Math.cos(p[k]), cy + rad*Math.sin(p[k]));
+                phaseCtx.lineTo(cx + rad*Math.cos(p[N_per_mod + k]), cy + rad*Math.sin(p[N_per_mod + k]));
+                phaseCtx.stroke();
+            }
+
+            const drawVector = (r, psi, color, width) => {
+                phaseCtx.beginPath(); phaseCtx.moveTo(cx, cy);
+                phaseCtx.lineTo(cx + rad*r*Math.cos(psi), cy + rad*r*Math.sin(psi));
+                phaseCtx.strokeStyle = color; phaseCtx.lineWidth = width; phaseCtx.stroke();
+            };
+            drawVector(op1.r, op1.psi, '#ff4757', 3);
+            drawVector(op2.r, op2.psi, '#1e90ff', 3);
+            drawVector(R, Psi, '#00ffcc', 4);
+
+            const drawLine = (hist, color) => {
+                plotCtx.beginPath(); plotCtx.moveTo(0, 350 - hist[0]*300);
+                for(let i=1; i<historyLength; i++) plotCtx.lineTo(i, 350 - hist[i]*300);
+                plotCtx.strokeStyle = color; plotCtx.lineWidth = 2; plotCtx.stroke();
+            };
+            drawLine(r1_hist, '#ff4757');
+            drawLine(r2_hist, '#1e90ff');
+            drawLine(R_hist, '#00ffcc');
+
+            plotCtx.fillStyle = 'white'; plotCtx.font = "14px Arial";
+            plotCtx.fillText("R global: " + R.toFixed(2), 10, 20);
+            plotCtx.fillText("r₁ local: " + op1.r.toFixed(2), 10, 40);
+            plotCtx.fillText("r₂ local: " + op2.r.toFixed(2), 10, 60);
+        }
+
+        init();
+        update();
+    </script>
+</body>
+</html>

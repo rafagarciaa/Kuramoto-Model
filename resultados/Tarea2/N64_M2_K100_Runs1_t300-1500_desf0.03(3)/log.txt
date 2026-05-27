@@ -1,0 +1,57 @@
+Log de ejecucion - 2026-05-05 20:26:49
+============================================================
+
+Carpeta de resultados: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N64_M2_K100_Runs1_t300-1500_desf0.03(3)
+Log de salida:         C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N64_M2_K100_Runs1_t300-1500_desf0.03(3)\log.txt
+
+K en [0.005, 59.4](logspace)
+t_max(K) en [300, 300] u.t.
+
+
+############################################################
+#  MODO SYNC: barrido completo en K
+############################################################
+Generando ICs y matrices de adyacencia (una por run)...
+  Guardadas en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N64_M2_K100_Runs1_t300-1500_desf0.03(3)\sync\condiciones_iniciales.npz
+  Heatmap A (run 0): C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N64_M2_K100_Runs1_t300-1500_desf0.03(3)\sync\A_run0.png
+  Densidades por bloque (run 0):
+[[1.000000e+00 9.765625e-04]
+ [9.765625e-04 1.000000e+00]]
+
+
+============================================================
+  BARRIDO con metodo: EULER
+============================================================
+Barrido [EULER]: 100 K x 1 runs = 100 simulaciones
+  Total simulado: 30000 u.t. (3.00e+07 pasos)
+  Workers (n_jobs): 16
+
+Lanzando 100 simulaciones en paralelo...
+[Parallel(n_jobs=16)]: Using backend LokyBackend with 16 concurrent workers.
+[Parallel(n_jobs=16)]: Done   9 tasks      | elapsed:   14.8s
+[Parallel(n_jobs=16)]: Done  18 tasks      | elapsed:   26.0s
+[Parallel(n_jobs=16)]: Done  29 tasks      | elapsed:   27.1s
+[Parallel(n_jobs=16)]: Done  40 tasks      | elapsed:   36.9s
+[Parallel(n_jobs=16)]: Done  53 tasks      | elapsed:   46.7s
+[Parallel(n_jobs=16)]: Done  66 tasks      | elapsed:   56.0s
+[Parallel(n_jobs=16)]: Done  80 out of 100 | elapsed:   57.3s remaining:   14.2s
+[Parallel(n_jobs=16)]: Done  91 out of 100 | elapsed:  1.1min remaining:    6.4s
+[Parallel(n_jobs=16)]: Done 100 out of 100 | elapsed:  1.2min finished
+  Tiempo barrido [euler]: 1.2 min
+
+  Ajustes R_modelo (Kc, alpha, R_inf) +/- 1-sigma:
+     curva |           Kc |      alpha |      R_inf | nota
+       r_1 | 0.03542 +/-1e-08 | 1.559 +/-2.5e-06 | 1.006 +/-1.4e-07 |
+       r_2 | 0.05145 +/-1.5e-08 | 2.259 +/-4.4e-06 | 1.001 +/-1.3e-07 |
+    R glob | 0.04474 +/-1e-07 | 0.500 +/-1.4e-06 | 0.886 +/-3.2e-07 | K > 0.0651
+
+  ------------------------------------------------------------
+  [EULER]
+    Modulo |  Kc experimental |    <sigma_r>
+    global |           0.6422 |      0.14677
+         1 |          0.03546 |      0.02658
+         2 |           0.0502 |      0.03251
+
+Tiempo total de ejecucion: 1.2 min (71.7 s)
+
+Listo. Resultados en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea2\N64_M2_K100_Runs1_t300-1500_desf0.03(3)
