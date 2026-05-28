@@ -29,7 +29,8 @@ from kuramoto.grids         import (
     t_max_per_K, t_max_per_K_log,
 )
 from kuramoto.networks      import (
-    generar_ICs, generar_As_modular, crear_matriz_modular,
+    generar_ICs, generar_ICs_por_sigma,
+    generar_As_modular, crear_matriz_modular,
     stats_matriz_adyacencia,
 )
 from kuramoto.conectoma     import (
