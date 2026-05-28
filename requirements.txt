@@ -1,0 +1,15 @@
+# Dependencias para ejecutar KuramotoFinal/Kuramoto.py
+#
+# Instalacion:
+#   python -m venv .venv
+#   .venv\Scripts\activate          (Windows PowerShell / cmd)
+#   source .venv/bin/activate       (Git Bash / Linux / Mac)
+#   pip install -r requirements.txt
+#
+# Probado con Python 3.12 y 3.13 (numba >= 0.61 soporta 3.13).
+
+numpy>=1.26
+scipy>=1.11
+matplotlib>=3.8
+joblib>=1.3
+numba>=0.61
