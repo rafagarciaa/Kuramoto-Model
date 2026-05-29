@@ -21,9 +21,40 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from scipy.interpolate import PchipInterpolator
 
 from kuramoto_scripts.observables import Kc_teorica, Kc_experimental
 from kuramoto_scripts.io          import _ruta
+
+
+# ----------------------------------------------------------------------------
+# Suavizado para visualizacion (PCHIP)
+# ----------------------------------------------------------------------------
+
+def _smooth(x, y, log_x=False, n=300):
+    """Spline monotono por tramos (PCHIP) para suavizar la curva visual.
+
+    Mantenemos los marcadores como dato; esto es solo decoracion. PCHIP
+    se prefiere al cubico clasico porque no produce overshoots en
+    transiciones abruptas (R pasando de ~0 a ~1 cerca de Kc).
+
+    En eje log el x_fine es geomspace para que la curva quede suave en
+    pantalla con escala logaritmica.
+    """
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    if len(x) < 4:
+        return x, y
+    order = np.argsort(x)
+    xs, ys = x[order], y[order]
+    keep = np.concatenate([[True], np.diff(xs) > 0])
+    xs, ys = xs[keep], ys[keep]
+    if len(xs) < 4:
+        return xs, ys
+    spline = PchipInterpolator(xs, ys, extrapolate=False)
+    x_fine = (np.geomspace(xs[0], xs[-1], n) if log_x
+              else np.linspace(xs[0], xs[-1], n))
+    return x_fine, spline(x_fine)
 
 
 # ----------------------------------------------------------------------------
@@ -78,7 +109,10 @@ def plot_mean_field(K_grid, sigmas, out, N, n_runs, save_dir):
             Kc = Kc_teorica(sigma)
             ax.fill_between(K_grid[i], R_mean[i] - R_err[i], R_mean[i] + R_err[i],
                             color=colors[i], alpha=0.25)
-            ax.plot(K_grid[i], R_mean[i], marker='o', ms=4, lw=1.5, color=colors[i],
+            # Marcadores = dato; spline (PCHIP) = decoracion visual.
+            ax.plot(K_grid[i], R_mean[i], 'o', ms=4, color=colors[i])
+            xs, ys = _smooth(K_grid[i], R_mean[i], log_x=False)
+            ax.plot(xs, ys, '-', lw=1.5, color=colors[i],
                     label=fr'$\sigma={sigma:.2f}$  $K_c^{{th}}={Kc:.2f}$')
             ax.axvline(Kc, color=colors[i], ls='--', lw=1.0, alpha=0.6)
         _set_K_axis(ax, log_x=False)
@@ -89,7 +123,9 @@ def plot_mean_field(K_grid, sigmas, out, N, n_runs, save_dir):
     def draw_sigma(ax):
         for i, sigma in enumerate(sigmas):
             Kc_exp = Kc_experimental(K_grid[i], R_sigma[i], log=False)
-            ax.plot(K_grid[i], R_sigma[i], marker='o', ms=4, lw=1.5, color=colors[i],
+            ax.plot(K_grid[i], R_sigma[i], 'o', ms=4, color=colors[i])
+            xs, ys = _smooth(K_grid[i], R_sigma[i], log_x=False)
+            ax.plot(xs, ys, '-', lw=1.5, color=colors[i],
                     label=fr'$\sigma={sigma:.2f}$  $K_c^{{exp}}={Kc_exp:.3g}$')
             ax.axvline(Kc_exp, color=colors[i], ls=':', lw=1.2, alpha=0.8)
         _set_K_axis(ax, log_x=False)
@@ -159,17 +195,20 @@ def plot_scaling_Kc(inv_N, N_values, Kc_per_N, Kc_inf, lines, sigmas, save_dir):
 
 def _draw_global_R(ax, K, R_mean, R_err, log_x, label=r'$\langle R\rangle$ (global)'):
     ax.fill_between(K, R_mean - R_err, R_mean + R_err, color='k', alpha=0.2)
-    ax.plot(K, R_mean, marker='o', ms=4, lw=1.8, color='k', label=label)
+    ax.plot(K, R_mean, 'o', ms=4, color='k')
+    xs, ys = _smooth(K, R_mean, log_x=log_x)
+    ax.plot(xs, ys, '-', lw=1.8, color='k', label=label)
 
 
-def _draw_groups(ax, K, rm_mean, rm_err, labels, cmap_lims=(0.2, 0.85)):
+def _draw_groups(ax, K, rm_mean, rm_err, labels, log_x=False, cmap_lims=(0.2, 0.85)):
     ng = rm_mean.shape[-1]
     colors = plt.cm.viridis(np.linspace(*cmap_lims, ng))
     for g in range(ng):
         ax.fill_between(K, rm_mean[:, g] - rm_err[:, g], rm_mean[:, g] + rm_err[:, g],
                         color=colors[g], alpha=0.15)
-        ax.plot(K, rm_mean[:, g], marker='o', ms=3, lw=1.2, color=colors[g],
-                label=labels[g])
+        ax.plot(K, rm_mean[:, g], 'o', ms=3, color=colors[g])
+        xs, ys = _smooth(K, rm_mean[:, g], log_x=log_x)
+        ax.plot(xs, ys, '-', lw=1.2, color=colors[g], label=labels[g])
     return colors
 
 
@@ -186,7 +225,7 @@ def plot_modular(K_grid, out, N, n_runs, n_modules, save_dir):
 
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(15, 5.2))
 
-    _draw_groups(a1, K, lvl['rm_mean'][0], lvl['rm_err'][0], labels)
+    _draw_groups(a1, K, lvl['rm_mean'][0], lvl['rm_err'][0], labels, log_x=True)
     _draw_global_R(a1, K, R_mean, R_err, log_x=True)
     _set_K_axis(a1, log_x=True)
     a1.set_ylabel('Parametros de orden'); a1.set_ylim(-0.02, 1.02)
@@ -198,10 +237,14 @@ def plot_modular(K_grid, out, N, n_runs, n_modules, save_dir):
     colors = plt.cm.viridis(np.linspace(0.2, 0.85, ng))
     for g in range(ng):
         Kc_m = Kc_experimental(K, lvl['rm_sigma'][0][:, g], log=True)
-        a2.plot(K, lvl['rm_sigma'][0][:, g], marker='o', ms=3, lw=1.0, color=colors[g],
+        a2.plot(K, lvl['rm_sigma'][0][:, g], 'o', ms=3, color=colors[g])
+        xs, ys = _smooth(K, lvl['rm_sigma'][0][:, g], log_x=True)
+        a2.plot(xs, ys, '-', lw=1.0, color=colors[g],
                 label=fr'$\sigma_{{r_{{{g+1}}}}}$  $K_c={Kc_m:.3g}$')
     Kc_g = Kc_experimental(K, R_sigma, log=True)
-    a2.plot(K, R_sigma, marker='o', ms=4, lw=1.8, color='k',
+    a2.plot(K, R_sigma, 'o', ms=4, color='k')
+    xs, ys = _smooth(K, R_sigma, log_x=True)
+    a2.plot(xs, ys, '-', lw=1.8, color='k',
             label=fr'$\sigma_R$ (global)  $K_c={Kc_g:.3g}$')
     a2.axvline(Kc_g, color='k', ls='--', lw=1.2, alpha=0.7)
     _set_K_axis(a2, log_x=True)
@@ -234,7 +277,7 @@ def plot_hierarchical(K_grid, out, module_id, submodule_id, N, n_runs, save_dir)
     # --- Figura global: R + r^1 por modulo ---
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(15, 5.2))
     labels = [fr'$\langle r^1_{{{m+1}}}\rangle$' for m in range(n_modules)]
-    _draw_groups(a1, K, nivel_mod['rm_mean'][0], nivel_mod['rm_err'][0], labels)
+    _draw_groups(a1, K, nivel_mod['rm_mean'][0], nivel_mod['rm_err'][0], labels, log_x=True)
     _draw_global_R(a1, K, R_mean, R_err, log_x=True)
     _set_K_axis(a1, log_x=True)
     a1.set_ylabel('Parametros de orden'); a1.set_ylim(-0.02, 1.02)
@@ -244,10 +287,14 @@ def plot_hierarchical(K_grid, out, module_id, submodule_id, N, n_runs, save_dir)
 
     colors = plt.cm.viridis(np.linspace(0.2, 0.85, n_modules))
     for m in range(n_modules):
-        a2.plot(K, nivel_mod['rm_sigma'][0][:, m], marker='o', ms=3, lw=1.2,
-                color=colors[m], label=fr'$\sigma_{{r^1_{{{m+1}}}}}$')
+        a2.plot(K, nivel_mod['rm_sigma'][0][:, m], 'o', ms=3, color=colors[m])
+        xs, ys = _smooth(K, nivel_mod['rm_sigma'][0][:, m], log_x=True)
+        a2.plot(xs, ys, '-', lw=1.2, color=colors[m],
+                label=fr'$\sigma_{{r^1_{{{m+1}}}}}$')
     Kc_g = Kc_experimental(K, R_sigma, log=True)
-    a2.plot(K, R_sigma, marker='o', ms=4, lw=1.8, color='k',
+    a2.plot(K, R_sigma, 'o', ms=4, color='k')
+    xs, ys = _smooth(K, R_sigma, log_x=True)
+    a2.plot(xs, ys, '-', lw=1.8, color='k',
             label=fr'$\sigma_R$ (global)  $K_c={Kc_g:.3g}$')
     a2.axvline(Kc_g, color='k', ls='--', lw=1.2, alpha=0.7)
     _set_K_axis(a2, log_x=True)
@@ -264,12 +311,16 @@ def plot_hierarchical(K_grid, out, module_id, submodule_id, N, n_runs, save_dir)
 
         colors = plt.cm.plasma(np.linspace(0.15, 0.8, len(subs_m)))
         for k, s in enumerate(subs_m):
-            ax.plot(K, nivel_sub['rm_mean'][0][:, s], marker='o', ms=3, lw=1.1,
-                    color=colors[k], label=fr'$\langle r^2_{{{s+1}}}\rangle$')
+            ax.plot(K, nivel_sub['rm_mean'][0][:, s], 'o', ms=3, color=colors[k])
+            xs, ys = _smooth(K, nivel_sub['rm_mean'][0][:, s], log_x=True)
+            ax.plot(xs, ys, '-', lw=1.1, color=colors[k],
+                    label=fr'$\langle r^2_{{{s+1}}}\rangle$')
 
         # r^1 del modulo padre, en negro grueso.
-        ax.plot(K, nivel_mod['rm_mean'][0][:, m], marker='s', ms=4, lw=2.0,
-                color='k', label=fr'$\langle r^1_{{{m+1}}}\rangle$ (modulo)')
+        ax.plot(K, nivel_mod['rm_mean'][0][:, m], 's', ms=4, color='k')
+        xs, ys = _smooth(K, nivel_mod['rm_mean'][0][:, m], log_x=True)
+        ax.plot(xs, ys, '-', lw=2.0, color='k',
+                label=fr'$\langle r^1_{{{m+1}}}\rangle$ (modulo)')
 
         _set_K_axis(ax, log_x=True)
         ax.set_ylabel('Parametros de orden'); ax.set_ylim(-0.02, 1.02)
@@ -294,7 +345,7 @@ def plot_connectome(K_grid, out_conn, out_rand, N, n_runs, save_dir,
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(15, 5.2))
 
     labels = [fr'$\langle r_{{{h}}}\rangle$' for h in hemi_labels]
-    _draw_groups(a1, K, hemi['rm_mean'][0], hemi['rm_err'][0], labels)
+    _draw_groups(a1, K, hemi['rm_mean'][0], hemi['rm_err'][0], labels, log_x=True)
     _draw_global_R(a1, K, R_mean, R_err, log_x=True)
     _set_K_axis(a1, log_x=True)
     a1.set_ylabel('Parametros de orden'); a1.set_ylim(-0.02, 1.02)
@@ -303,9 +354,13 @@ def plot_connectome(K_grid, out_conn, out_rand, N, n_runs, save_dir,
     _info_box(a1, fr'$N={N}$, runs$={n_runs}$', 'bottom')
 
     for h in range(hemi['rm_sigma'].shape[-1]):
-        a2.plot(K, hemi['rm_sigma'][0][:, h], marker='o', ms=3, lw=1.2,
+        a2.plot(K, hemi['rm_sigma'][0][:, h], 'o', ms=3)
+        xs, ys = _smooth(K, hemi['rm_sigma'][0][:, h], log_x=True)
+        a2.plot(xs, ys, '-', lw=1.2,
                 label=fr'$\sigma_{{r_{{{hemi_labels[h]}}}}}$')
-    a2.plot(K, R_sigma, marker='o', ms=4, lw=1.8, color='k', label=r'$\sigma_R$ (global)')
+    a2.plot(K, R_sigma, 'o', ms=4, color='k')
+    xs, ys = _smooth(K, R_sigma, log_x=True)
+    a2.plot(xs, ys, '-', lw=1.8, color='k', label=r'$\sigma_R$ (global)')
     _set_K_axis(a2, log_x=True)
     a2.set_ylabel(r'$\sigma$'); a2.set_title('Metaestabilidad (conectoma)')
     a2.legend(loc='upper right')
@@ -317,9 +372,12 @@ def plot_connectome(K_grid, out_conn, out_rand, N, n_runs, save_dir,
     Rr, Sr = out_rand['R_mean'][0], out_rand['R_sigma'][0]
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(15, 5.2))
 
-    a1.plot(K, Rc, marker='o', ms=4, lw=1.8, color='#1f77b4', label='Conectoma')
-    a1.plot(K, Rr, marker='s', ms=4, lw=1.6, ls='--', color='#d62728',
-            label='Aleatoria (mismo grado)')
+    a1.plot(K, Rc, 'o', ms=4, color='#1f77b4')
+    xs, ys = _smooth(K, Rc, log_x=True)
+    a1.plot(xs, ys, '-', lw=1.8, color='#1f77b4', label='Conectoma')
+    a1.plot(K, Rr, 's', ms=4, color='#d62728')
+    xs, ys = _smooth(K, Rr, log_x=True)
+    a1.plot(xs, ys, '--', lw=1.6, color='#d62728', label='Aleatoria (mismo grado)')
     _set_K_axis(a1, log_x=True)
     a1.set_ylabel(r'$\langle R \rangle$'); a1.set_ylim(-0.02, 1.02)
     a1.set_title(r'$\langle R\rangle$: conectoma vs aleatoria')
@@ -327,9 +385,13 @@ def plot_connectome(K_grid, out_conn, out_rand, N, n_runs, save_dir,
 
     Kc_c = Kc_experimental(K, Sc, log=True)
     Kc_r = Kc_experimental(K, Sr, log=True)
-    a2.plot(K, Sc, marker='o', ms=4, lw=1.8, color='#1f77b4',
+    a2.plot(K, Sc, 'o', ms=4, color='#1f77b4')
+    xs, ys = _smooth(K, Sc, log_x=True)
+    a2.plot(xs, ys, '-', lw=1.8, color='#1f77b4',
             label=fr'Conectoma  $K_c={Kc_c:.3g}$')
-    a2.plot(K, Sr, marker='s', ms=4, lw=1.6, ls='--', color='#d62728',
+    a2.plot(K, Sr, 's', ms=4, color='#d62728')
+    xs, ys = _smooth(K, Sr, log_x=True)
+    a2.plot(xs, ys, '--', lw=1.6, color='#d62728',
             label=fr'Aleatoria  $K_c={Kc_r:.3g}$')
     _set_K_axis(a2, log_x=True)
     a2.set_ylabel(r'$\sigma_R$')
