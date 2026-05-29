@@ -12,6 +12,8 @@
     "K_sweep.n_K": "Numero de valores de K del barrido.",
     "K_sweep.K_width_factor": "Anchura de la densidad t-Student que concentra puntos K cerca de Kc.",
     "tipo0_mean_field": "Campo medio: barrido en sigma. K lineal en torno al Kc teorico de cada sigma.",
+    "tipo0_mean_field.scaling": "Finite-size scaling. Si true, corre varias N (fracciones de N) y extrapola Kc a 1/N=0 (limite termodinamico) por ajuste lineal de Kc vs 1/N.",
+    "tipo0_mean_field.scaling_fracs": "Fracciones de N a simular cuando scaling=true. Ej. [0.2,0.4,0.6,0.8,1.0].",
     "tipo1_modular": "Red modular de un nivel. n_modules bloques simetricos, densos por dentro.",
     "tipo2_hierarchical.submodules_per_module": "Array: cada elemento = nº de submodulos (simetricos) dentro de ese modulo de nivel 1.",
     "tipo3_connectome.mat_file": "Nombre del .mat dentro de ./data/.",
@@ -46,7 +48,9 @@
     "sigma_min": 0.5,
     "sigma_max": 1.5,
     "K_min": 0.25,
-    "K_max": 4.0
+    "K_max": 4.0,
+    "scaling": false,
+    "scaling_fracs": [0.2, 0.4, 0.6, 0.8, 1.0]
   },
 
   "tipo1_modular": {

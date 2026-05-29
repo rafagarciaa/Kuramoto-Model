@@ -43,5 +43,5 @@ from kuramoto_scripts.io           import (
 from kuramoto_scripts.plotting     import (
     setup_plot_style,
     plot_mean_field, plot_modular, plot_hierarchical, plot_connectome,
-    plot_matriz_adyacencia,
+    plot_scaling_Kc, plot_matriz_adyacencia,
 )

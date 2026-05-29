@@ -110,6 +110,50 @@ def plot_mean_field(K_grid, sigmas, out, N, n_runs, save_dir):
 
 
 # ----------------------------------------------------------------------------
+# sim_type 0 con scaling: extrapolacion de Kc a N->inf (1/N -> 0)
+# ----------------------------------------------------------------------------
+
+def plot_scaling_Kc(inv_N, N_values, Kc_per_N, Kc_inf, lines, sigmas, save_dir):
+    """Finite-size scaling: Kc(N) vs 1/N + recta extrapolada a 1/N=0.
+
+    inv_N     : (n_N,)               -> 1/N de cada tamaño.
+    Kc_per_N  : (n_sigmas, n_N)      -> Kc experimental para cada (sigma, N).
+    Kc_inf    : (n_sigmas,)          -> corte de la recta en 1/N=0.
+    lines     : lista de (pendiente, ordenada) por sigma.
+    """
+    setup_plot_style()
+    fig, ax = plt.subplots(figsize=(8, 5.6))
+    colors = plt.cm.viridis(np.linspace(0.15, 0.85, len(sigmas)))
+    x_fit = np.array([0.0, float(np.max(inv_N))])
+
+    for i, sigma in enumerate(sigmas):
+        c = colors[i]
+        slope, intercept = lines[i]
+        # Puntos Kc(N).
+        ax.plot(inv_N, Kc_per_N[i], 'o', ms=6, color=c)
+        # Recta de ajuste, extendida hasta 1/N = 0.
+        ax.plot(x_fit, intercept + slope * x_fit, '--', lw=1.3, color=c)
+        # Punto extrapolado en 1/N = 0.
+        ax.plot(0.0, Kc_inf[i], '*', ms=15, color=c, zorder=5)
+        # Kc teorico de referencia.
+        Kc_th = Kc_teorica(sigma)
+        ax.axhline(Kc_th, ls=':', lw=1.0, color=c, alpha=0.5)
+        ax.plot([], [], '-', color=c,
+                label=fr'$\sigma={sigma:.2f}$: $K_c^\infty={Kc_inf[i]:.3f}$, '
+                      fr'$K_c^{{th}}={Kc_th:.3f}$')
+
+    ax.axvline(0.0, color='gray', lw=0.8, alpha=0.6)
+    ax.set_xlabel(r'$1/N$')
+    ax.set_ylabel(r'$K_c$')
+    ax.set_xlim(left=-0.02 * float(np.max(inv_N)))
+    ax.set_title(r'Finite-size scaling: extrapolacion de $K_c$ a $N\to\infty$')
+    ax.legend(loc='best', title=r'$\bigstar$ = $K_c$ extrapolado ($1/N=0$)')
+    _info_box(ax, fr'$N$: {", ".join(str(n) for n in N_values)}', 'top')
+    fig.savefig(_ruta(save_dir, 'scaling_Kc.png'))
+    plt.close(fig)
+
+
+# ----------------------------------------------------------------------------
 # Helpers para red (una sola sigma -> fila 0)
 # ----------------------------------------------------------------------------
 

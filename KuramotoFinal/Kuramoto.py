@@ -24,7 +24,7 @@ import numpy as np
 
 from kuramoto_scripts import (
     load_params,
-    barrido, Kc_teorica,
+    barrido, Kc_teorica, Kc_experimental,
     K_values_tstudent, K_values_log_tstudent,
     generar_ICs, generar_ICs_por_sigma,
     generar_As_modular, generar_As_jerarquica,
@@ -32,7 +32,7 @@ from kuramoto_scripts import (
     crear_carpeta_resultados, guardar_params_txt,
     iniciar_log, cerrar_log, _ruta,
     plot_mean_field, plot_modular, plot_hierarchical, plot_connectome,
-    plot_matriz_adyacencia,
+    plot_scaling_Kc, plot_matriz_adyacencia,
 )
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -62,23 +62,71 @@ def _guardar(run_dir, K_grid, out, extra=None):
 # Tipo 0: campo medio
 # ============================================================================
 
+def _barrido_campo_medio(p, N, sigmas, K_grid):
+    """Un barrido de campo medio para un N dado. Devuelve el dict `out`."""
+    g, c = p.general, p.convergence
+    omegas_IC, thetas_IC = generar_ICs_por_sigma(len(sigmas), g.n_runs, N,
+                                                 sigmas, seed=g.seed)
+    return barrido(N, g.dt, p.max_steps, c.block_size, c.conv_threshold,
+                   K_grid, sigmas, g.n_runs, omegas_IC, thetas_IC,
+                   A_runs=None, level_ids=None, n_jobs=g.n_jobs)
+
+
 def run_tipo0(p, run_dir):
-    g, c, ks, s0 = p.general, p.convergence, p.K_sweep, p.tipo0_mean_field
+    g, ks, s0 = p.general, p.K_sweep, p.tipo0_mean_field
     sigmas = np.linspace(s0.sigma_min, s0.sigma_max, s0.n_sigmas)
 
+    # K es lineal en torno al Kc teorico de cada sigma. NO depende de N,
+    # asi que la misma rejilla sirve para todos los tamaños del scaling.
     K_grid = np.zeros((s0.n_sigmas, ks.n_K))
     for i, sigma in enumerate(sigmas):
         K_grid[i] = K_values_tstudent(ks.n_K, s0.K_min, s0.K_max,
                                       Kc_teorica(sigma), ks.K_width_factor)
 
-    omegas_IC, thetas_IC = generar_ICs_por_sigma(s0.n_sigmas, g.n_runs, g.N,
-                                                 sigmas, seed=g.seed)
-    out = barrido(g.N, g.dt, p.max_steps, c.block_size, c.conv_threshold,
-                  K_grid, sigmas, g.n_runs, omegas_IC, thetas_IC,
-                  A_runs=None, level_ids=None, n_jobs=g.n_jobs)
+    scaling = getattr(s0, 'scaling', False)
 
-    _guardar(run_dir, K_grid, out, extra={'sigmas': sigmas})
-    plot_mean_field(K_grid, sigmas, out, g.N, g.n_runs, run_dir)
+    # --- Caso simple: un solo N ---
+    if not scaling:
+        out = _barrido_campo_medio(p, g.N, sigmas, K_grid)
+        _guardar(run_dir, K_grid, out, extra={'sigmas': sigmas})
+        plot_mean_field(K_grid, sigmas, out, g.N, g.n_runs, run_dir)
+        return
+
+    # --- Finite-size scaling: varias N, extrapolar Kc a 1/N = 0 ---
+    fracs = getattr(s0, 'scaling_fracs', [0.2, 0.4, 0.6, 0.8, 1.0])
+    N_values = [max(int(round(f * g.N)), 2) for f in fracs]
+    print(f"Finite-size scaling. N = {N_values}\n")
+
+    Kc_per_N = np.zeros((s0.n_sigmas, len(N_values)))
+    out_full = None
+    for k, Nk in enumerate(N_values):
+        print(f"--- N = {Nk}  ({k+1}/{len(N_values)}) ---")
+        outk = _barrido_campo_medio(p, Nk, sigmas, K_grid)
+        for i in range(s0.n_sigmas):
+            Kc_per_N[i, k] = Kc_experimental(K_grid[i], outk['R_sigma'][i], log=False)
+        out_full = outk  # el ultimo (N completa) se usa para las graficas estandar
+
+    inv_N = 1.0 / np.array(N_values, dtype=float)
+    lines, Kc_inf = [], np.zeros(s0.n_sigmas)
+    for i in range(s0.n_sigmas):
+        slope, intercept = np.polyfit(inv_N, Kc_per_N[i], 1)  # Kc ~ slope*(1/N) + intercept
+        lines.append((slope, intercept))
+        Kc_inf[i] = intercept                                 # corte en 1/N = 0
+
+    # Tabla comparativa.
+    print("\n" + "=" * 56)
+    print(f"{'sigma':>6} | {'Kc teorico':>11} | {'Kc(N max)':>10} | {'Kc inf':>8}")
+    print("-" * 56)
+    for i, sigma in enumerate(sigmas):
+        print(f"{sigma:>6.2f} | {Kc_teorica(sigma):>11.4f} | "
+              f"{Kc_per_N[i, -1]:>10.4f} | {Kc_inf[i]:>8.4f}")
+    print("=" * 56)
+
+    _guardar(run_dir, K_grid, out_full, extra={
+        'sigmas': sigmas, 'N_values': np.array(N_values), 'inv_N': inv_N,
+        'Kc_per_N': Kc_per_N, 'Kc_inf': Kc_inf})
+    plot_mean_field(K_grid, sigmas, out_full, g.N, g.n_runs, run_dir)
+    plot_scaling_Kc(inv_N, N_values, Kc_per_N, Kc_inf, lines, sigmas, run_dir)
 
 
 # ============================================================================
