@@ -1,0 +1,82 @@
+{
+  "_help": {
+    "sim_type": "0=campo medio | 1=modular (1 nivel) | 2=jerarquico (2 niveles) | 3=conectoma",
+    "general.N": "Numero de osciladores. En sim_type=3 se ignora (lo fija el conectoma).",
+    "general.dt": "Paso de integracion de Euler.",
+    "general.n_runs": "Numero de condiciones iniciales independientes por celda (sigma,K).",
+    "general.n_jobs": "Workers de joblib. -1 = todos los cores.",
+    "general.seed": "Semilla maestra (null = aleatoria cada vez).",
+    "convergence.block_size": "Pasos por bloque. Cada bloque se promedia y se compara con el anterior.",
+    "convergence.conv_threshold": "Si |media_bloque - media_bloque_anterior| < umbral, la simulacion para.",
+    "convergence.t_max": "Tope de seguridad en unidades de tiempo. max_steps = t_max/dt.",
+    "K_sweep.n_K": "Numero de valores de K del barrido.",
+    "K_sweep.K_width_factor": "Anchura de la densidad t-Student que concentra puntos K cerca de Kc.",
+    "tipo0_mean_field": "Campo medio: barrido en sigma. K lineal en torno al Kc teorico de cada sigma.",
+    "tipo1_modular": "Red modular de un nivel. n_modules bloques simetricos, densos por dentro.",
+    "tipo2_hierarchical.submodules_per_module": "Array: cada elemento = nº de submodulos (simetricos) dentro de ese modulo de nivel 1.",
+    "tipo3_connectome.mat_file": "Nombre del .mat dentro de ./data/.",
+    "tipo3_connectome.threshold": "'auto' = el mas alto que mantiene el grafo conexo; o un float.",
+    "tipo3_connectome.n_swaps_factor": "Double-edge swaps = n_swaps_factor * numero_de_aristas (matriz aleatoria que preserva grado).",
+    "K_min/K_max/K_center": "Rango y centro del barrido de K. K_max=null en red -> autocalcular por estabilidad. K_center=null -> logspace uniforme."
+  },
+
+  "sim_type": 0,
+
+  "general": {
+    "N": 1000,
+    "dt": 0.025,
+    "n_runs": 10,
+    "n_jobs": 16,
+    "seed": null
+  },
+
+  "convergence": {
+    "block_size": 100,
+    "conv_threshold": 1e-3,
+    "t_max": 2000.0
+  },
+
+  "K_sweep": {
+    "n_K": 30,
+    "K_width_factor": 0.3
+  },
+
+  "tipo0_mean_field": {
+    "n_sigmas": 3,
+    "sigma_min": 0.5,
+    "sigma_max": 1.5,
+    "K_min": 0.25,
+    "K_max": 4.0
+  },
+
+  "tipo1_modular": {
+    "n_modules": 3,
+    "p_intra": 1.0,
+    "n_edges_inter": 1,
+    "sigma": 1.0,
+    "K_min": 5e-3,
+    "K_max": null,
+    "K_center": null
+  },
+
+  "tipo2_hierarchical": {
+    "submodules_per_module": [3, 3, 3],
+    "p_intra_submodule": 1.0,
+    "n_edges_inter_submodule": 2,
+    "n_edges_inter_module": 1,
+    "sigma": 1.0,
+    "K_min": 5e-3,
+    "K_max": null,
+    "K_center": null
+  },
+
+  "tipo3_connectome": {
+    "mat_file": "SCmatrices88healthy.mat",
+    "threshold": "auto",
+    "n_swaps_factor": 10,
+    "sigma": 1.0,
+    "K_min": 5e-3,
+    "K_max": null,
+    "K_center": null
+  }
+}
