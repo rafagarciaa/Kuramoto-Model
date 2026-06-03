@@ -1,0 +1,22 @@
+Log de ejecucion - 2026-05-29 09:36:56
+============================================================
+
+Tarea:                Tarea1
+Modo:                 CAMPO MEDIO
+Carpeta resultados:   C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea1\N3000_sigmas3_K300_Runs1_t400-1500(1)
+Log:                  C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\Tarea1\N3000_sigmas3_K300_Runs1_t400-1500(1)\log.txt
+
+Generando condiciones iniciales pareadas...
+
+Barrido: 3 sigmas x 300 K x 1 runs
+Total simulado: 995809 u.t. (3.98e+07 pasos)
+
+Barrido: 3 sigmas x 300 K x 1 runs = 900 simulaciones
+  Total simulado: 995809 u.t. (3.98e+07 pasos aprox.)
+  Workers (n_jobs): 16
+
+Lanzando 900 simulaciones en paralelo...
+[Parallel(n_jobs=16)]: Using backend LokyBackend with 16 concurrent workers.
+[Parallel(n_jobs=16)]: Done   9 tasks      | elapsed:    9.2s
+[Parallel(n_jobs=16)]: Done  18 tasks      | elapsed:   14.7s
+[Parallel(n_jobs=16)]: Done  29 tasks      | elapsed:   15.4s

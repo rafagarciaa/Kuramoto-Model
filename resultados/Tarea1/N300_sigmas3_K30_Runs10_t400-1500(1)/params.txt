@@ -1,0 +1,19 @@
+Parametros de la ejecucion
+========================================
+tarea                     = Tarea1
+modo                      = campo_medio
+N                         = 300
+dt                        = 0.025
+t_max_base                = 400.0
+t_max_peak                = 1500.0
+num_K                     = 30
+num_runs                  = 10
+width_factor              = 0.3
+sigma_values              = [np.float64(0.5), np.float64(1.0), np.float64(1.5)]
+K_min                     = 0.25
+K_max                     = 4.0
+K_center_red              = None
+n_jobs                    = 16
+seed                      = None
+A_shape                   = None
+module_id                 = None

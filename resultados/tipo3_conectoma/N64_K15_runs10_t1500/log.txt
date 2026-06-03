@@ -1,0 +1,63 @@
+Log de ejecucion - 2026-06-02 18:01:54
+============================================================
+
+sim_type = 3  (tipo3_conectoma)
+Resultados: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo3_conectoma\N64_K15_runs10_t1500
+
+Threshold explicito: 0.000250
+Conectoma preparado: N=90, |E|=1649, densidad=0.4117
+
+--- Barrido CONECTOMA ---
+Barrido: 1 sigmas x 15 K x 10 runs = 150 simulaciones
+  Niveles: 1  (grupos por nivel: [2])
+  Parada: block_size=250, conv_threshold=0.001, max_steps=60000
+  Workers (n_jobs): 6
+
+Lanzando 150 simulaciones en paralelo...
+[Parallel(n_jobs=6)]: Using backend LokyBackend with 6 concurrent workers.
+[Parallel(n_jobs=6)]: Done   1 tasks      | elapsed:    1.7s
+[Parallel(n_jobs=6)]: Done   6 tasks      | elapsed:    2.1s
+[Parallel(n_jobs=6)]: Done  13 tasks      | elapsed:    3.2s
+[Parallel(n_jobs=6)]: Done  20 tasks      | elapsed:    3.7s
+[Parallel(n_jobs=6)]: Done  29 tasks      | elapsed:    4.2s
+[Parallel(n_jobs=6)]: Done  38 tasks      | elapsed:    5.8s
+[Parallel(n_jobs=6)]: Done  49 tasks      | elapsed:    7.5s
+[Parallel(n_jobs=6)]: Done  60 tasks      | elapsed:    8.5s
+[Parallel(n_jobs=6)]: Done  73 tasks      | elapsed:    9.3s
+[Parallel(n_jobs=6)]: Done  86 tasks      | elapsed:    9.8s
+[Parallel(n_jobs=6)]: Done 101 tasks      | elapsed:    9.9s
+[Parallel(n_jobs=6)]: Batch computation too fast (0.17742251768169032s.) Setting batch_size=2.
+[Parallel(n_jobs=6)]: Batch computation too fast (0.08280205726623535s.) Setting batch_size=4.
+[Parallel(n_jobs=6)]: Done 120 tasks      | elapsed:   10.0s
+[Parallel(n_jobs=6)]: Done 150 out of 150 | elapsed:   10.2s finished
+Tiempo del barrido: 0.2 min
+
+
+--- Barrido ALEATORIA (mismo grado) ---
+Barrido: 1 sigmas x 15 K x 10 runs = 150 simulaciones
+  Niveles: 1  (grupos por nivel: [2])
+  Parada: block_size=250, conv_threshold=0.001, max_steps=60000
+  Workers (n_jobs): 6
+
+Lanzando 150 simulaciones en paralelo...
+[Parallel(n_jobs=6)]: Using backend LokyBackend with 6 concurrent workers.
+[Parallel(n_jobs=6)]: Done   1 tasks      | elapsed:    0.0s
+[Parallel(n_jobs=6)]: Batch computation too fast (0.12704730033874512s.) Setting batch_size=2.
+[Parallel(n_jobs=6)]: Done   6 tasks      | elapsed:    0.5s
+[Parallel(n_jobs=6)]: Done  15 tasks      | elapsed:    2.0s
+[Parallel(n_jobs=6)]: Batch computation too slow (2.0516132788848878s.) Setting batch_size=1.
+[Parallel(n_jobs=6)]: Done  28 tasks      | elapsed:    3.8s
+[Parallel(n_jobs=6)]: Done  45 tasks      | elapsed:    5.2s
+[Parallel(n_jobs=6)]: Done  55 tasks      | elapsed:    7.5s
+[Parallel(n_jobs=6)]: Done  67 tasks      | elapsed:    9.6s
+[Parallel(n_jobs=6)]: Done  78 tasks      | elapsed:    9.8s
+[Parallel(n_jobs=6)]: Done  91 tasks      | elapsed:    9.9s
+[Parallel(n_jobs=6)]: Batch computation too fast (0.18746673042560164s.) Setting batch_size=2.
+[Parallel(n_jobs=6)]: Done 104 tasks      | elapsed:   10.0s
+[Parallel(n_jobs=6)]: Batch computation too fast (0.07930397987365723s.) Setting batch_size=4.
+[Parallel(n_jobs=6)]: Done 129 tasks      | elapsed:   10.1s
+[Parallel(n_jobs=6)]: Done 150 out of 150 | elapsed:   10.2s finished
+Tiempo del barrido: 0.2 min
+
+
+Listo en 0.4 min. Resultados en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo3_conectoma\N64_K15_runs10_t1500

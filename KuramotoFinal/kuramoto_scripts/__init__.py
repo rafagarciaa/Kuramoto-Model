@@ -34,6 +34,7 @@ from kuramoto_scripts.conectoma    import (
     cargar_conectoma_promedio, cargar_conectoma_sujetos,
     binarizar, es_conexo, buscar_threshold_optimo,
     cargar_y_preparar_A, hemisferio_ids, randomize_preserving_degree,
+    prepare_W_real, prepare_W_intervalos, randomize_preserving_strength,
 )
 from kuramoto_scripts.sweep        import barrido
 from kuramoto_scripts.io           import (

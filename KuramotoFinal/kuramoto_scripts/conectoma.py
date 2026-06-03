@@ -121,7 +121,7 @@ def buscar_threshold_optimo(W, n_thresholds=300, verbose=True):
                         'conexos': conexos}
 
 
-def cargar_y_preparar_A(ruta_mat, threshold='auto', clave='SCmatrices', verbose=True):
+def cargar_y_preparar_A(ruta_mat, threshold , clave='SCmatrices', verbose=True):
     """Pipeline: lee .mat -> W promedio -> threshold -> A binaria float64.
 
     threshold : 'auto'  -> usa buscar_threshold_optimo.
@@ -234,4 +234,133 @@ def randomize_preserving_degree(A, n_swaps_factor=10, rng=None):
     for (u, v) in edge_set:
         R[u, v] = 1.0
         R[v, u] = 1.0
+    return R
+
+
+# ============================================================================
+# Tipo 4: conectoma con pesos (sin binarizar)
+# ============================================================================
+#
+# La ecuacion dinamica es la misma de la red:
+#
+#     theta_dot_i = omega_i + K * sum_j W_ij * sin(theta_j - theta_i)
+#
+# pero W ya NO es binaria. K es entonces solo un multiplicador escalar y
+# son los pesos los que codifican la fuerza relativa de cada conexion.
+#
+# Dos preparaciones disponibles:
+#
+#   prepare_W_real(ruta)            -> W promedio con diagonal a 0, sin
+#                                      tocar valores.
+#   prepare_W_intervalos(ruta, ...) -> W normalizada y aproximada a una
+#                                      rejilla de n_levels valores en [0,1].
+#                                      Optionally log-transform antes de
+#                                      normalizar para aplanar la enorme
+#                                      asimetria de la distribucion de pesos
+#                                      del conectoma.
+# ----------------------------------------------------------------------------
+
+def prepare_W_real(ruta_mat, clave='SCmatrices'):
+    """W = promedio de los 88 sujetos, simetrizada y con diagonal a 0.
+
+    Simetrizamos con (W + W.T)/2 porque el conectoma es fisicamente no
+    direccional: cualquier asimetria proviene del ruido de tractografia.
+    La diagonal valia 1.0 en el dataset original (autoconexion trivial),
+    la forzamos a 0 para Kuramoto.
+    """
+    W = cargar_conectoma_promedio(ruta_mat, clave=clave).astype(np.float64)
+    W = 0.5 * (W + W.T)
+    np.fill_diagonal(W, 0.0)
+    return W
+
+
+def prepare_W_intervalos(ruta_mat, n_levels, log_transform=True,
+                          clave='SCmatrices'):
+    """W promedio con diagonal=0, normalizada a [0,1] y aproximada a una
+    rejilla de `n_levels` valores equispaciados.
+
+    Para `n_levels = N` los valores posibles son {0, 1/(N-1), 2/(N-1), ..., 1}.
+    Ejemplos: N=2 -> {0, 1}; N=3 -> {0, 0.5, 1}; N=5 -> {0, 0.25, 0.5, 0.75, 1}.
+
+    Cada entrada de W_norm se redondea al valor mas cercano de la rejilla.
+
+    log_transform:
+        El conectoma tiene una distribucion extremadamente sesgada (mediana
+        de los no-nulos ~1e-4, max=1.0). Si normalizas directamente por max,
+        casi todo cae cerca de 0 y los niveles altos quedan vacios. Aplicar
+        log(1+W) antes de normalizar comprime el rango dinamico y reparte la
+        masa entre los niveles. Recomendado True para el conectoma; False
+        si W ya tiene distribucion bien escalada.
+    """
+    W = cargar_conectoma_promedio(ruta_mat, clave=clave).astype(np.float64)
+    W = 0.5 * (W + W.T)              # simetrizar primero (ruido tractografia)
+    np.fill_diagonal(W, 0.0)
+
+    if log_transform:
+        W = np.log1p(W)              # log(1+W): comprime range dinamico
+
+    W_max = float(W.max())
+    if W_max <= 0:
+        return W.astype(np.float64)  # matriz vacia: nada que aproximar
+    W_norm = W / W_max                # ahora valores en [0, 1]
+
+    # Aproximacion a la rejilla {0, 1/(n-1), ..., 1}.
+    step = 1.0 / (n_levels - 1)
+    W_approx = np.round(W_norm * (n_levels - 1)) * step
+    np.fill_diagonal(W_approx, 0.0)   # garantizamos que la diagonal sigue 0
+    return W_approx.astype(np.float64)
+
+
+def randomize_preserving_strength(W, n_swaps_factor=20, rng=None):
+    """Devuelve una red aleatoria con misma strength por nodo que W.
+
+    Strength del nodo i = s_i = sum_j W_ij.
+
+    Algoritmo: 4-cycle swap (swap-balanced) que preserva strength EXACTO.
+    Repite la siguiente jugada n_swaps = n_swaps_factor * |E_nonzero|:
+        - Elegir 4 nodos distintos i, j, k, l al azar.
+        - Elegir un epsilon en [0, min(W_ij, W_kl)].
+        - W_ij -= eps, W_kl -= eps, W_il += eps, W_kj += eps.
+          (Simetrico, es decir tambien W_ji, W_lk, W_li, W_jk.)
+    Esto conserva s_i, s_j, s_k, s_l (cada nodo gana y pierde lo mismo).
+
+    Compara con `randomize_preserving_degree`: aquella conserva la
+    estructura binaria (cada nodo tiene mismo numero de vecinos);
+    esta conserva strength en grafos con pesos arbitrarios.
+    """
+    if rng is None:
+        rng = np.random.default_rng()
+
+    R = W.copy().astype(np.float64)
+    np.fill_diagonal(R, 0.0)
+    N = R.shape[0]
+    E_nonzero = int((R > 0).sum() // 2)     # aristas para escalar n_swaps
+    if E_nonzero < 2 or N < 4:
+        return R
+
+    n_swaps = int(n_swaps_factor * E_nonzero)
+    hechos, intentos = 0, 0
+    max_intentos = 50 * n_swaps
+
+    while hechos < n_swaps and intentos < max_intentos:
+        intentos += 1
+        # Elegir 4 nodos distintos.
+        idx = rng.choice(N, size=4, replace=False)
+        i, j, k, l = int(idx[0]), int(idx[1]), int(idx[2]), int(idx[3])
+
+        wij, wkl = R[i, j], R[k, l]
+        # Solo tiene sentido si al menos una de las dos aristas tiene peso.
+        # Si ambas son 0, no podemos restar nada.
+        max_eps = min(wij, wkl)
+        if max_eps <= 0:
+            continue
+
+        eps = float(rng.uniform(0.0, max_eps))
+        # Aplicar swap simetrico.
+        R[i, j] -= eps;  R[j, i] -= eps
+        R[k, l] -= eps;  R[l, k] -= eps
+        R[i, l] += eps;  R[l, i] += eps
+        R[k, j] += eps;  R[j, k] += eps
+        hechos += 1
+
     return R

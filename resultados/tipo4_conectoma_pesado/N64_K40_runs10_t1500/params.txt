@@ -1,0 +1,23 @@
+Parametros de la ejecucion
+========================================
+sim_type                  = 4
+max_steps                 = 60000
+general.N                 = 64
+general.dt                = 0.025
+general.n_runs            = 10
+general.n_jobs            = 14
+general.seed              = None
+convergence.block_size    = 1000
+convergence.conv_threshold = 0.001
+convergence.t_max         = 1500.0
+K_sweep.n_K               = 40
+K_sweep.K_width_factor    = 0.2
+tipo4_connectome_weighted.mat_file = SCmatrices88healthy.mat
+tipo4_connectome_weighted.approximation = intervalos
+tipo4_connectome_weighted.n_levels = 5
+tipo4_connectome_weighted.log_transform = True
+tipo4_connectome_weighted.n_swaps_factor = 20
+tipo4_connectome_weighted.sigma = 1.0
+tipo4_connectome_weighted.K_min = 0.005
+tipo4_connectome_weighted.K_max = None
+tipo4_connectome_weighted.K_center = None

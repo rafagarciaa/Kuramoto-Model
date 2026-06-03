@@ -1,0 +1,21 @@
+Parametros de la ejecucion
+========================================
+sim_type                  = 0
+max_steps                 = 40000
+general.N                 = 3000
+general.dt                = 0.025
+general.n_runs            = 30
+general.n_jobs            = 16
+general.seed              = 42
+convergence.block_size    = 250
+convergence.conv_threshold = 0.001
+convergence.t_max         = 1000.0
+K_sweep.n_K               = 60
+K_sweep.K_width_factor    = 0.3
+tipo0_mean_field.n_sigmas = 3
+tipo0_mean_field.sigma_min = 0.5
+tipo0_mean_field.sigma_max = 1.5
+tipo0_mean_field.K_min    = 0.25
+tipo0_mean_field.K_max    = 4.5
+tipo0_mean_field.scaling  = True
+tipo0_mean_field.scaling_fracs = [0.2, 0.4, 0.6, 0.8, 1.0]

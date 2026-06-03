@@ -1,0 +1,53 @@
+Log de ejecucion - 2026-06-02 12:54:48
+============================================================
+
+sim_type = 2  (tipo2_jerarquico)
+Resultados: C:\users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo2_jerarquico\N256_K20_runs40_t1500
+
+Barrido: 1 sigmas x 20 K x 40 runs = 800 simulaciones
+  Niveles: 2  (grupos por nivel: [3, 9])
+  Parada: block_size=250, conv_threshold=0.001, max_steps=60000
+  Workers (n_jobs): 8
+
+Lanzando 800 simulaciones en paralelo...
+[Parallel(n_jobs=8)]: Using backend LokyBackend with 8 concurrent workers.
+[Parallel(n_jobs=8)]: Done   2 tasks      | elapsed:    2.7s
+[Parallel(n_jobs=8)]: Done   9 tasks      | elapsed:    6.9s
+[Parallel(n_jobs=8)]: Done  16 tasks      | elapsed:   12.7s
+[Parallel(n_jobs=8)]: Done  25 tasks      | elapsed:   20.3s
+[Parallel(n_jobs=8)]: Done  34 tasks      | elapsed:   25.0s
+[Parallel(n_jobs=8)]: Done  45 tasks      | elapsed:   31.4s
+[Parallel(n_jobs=8)]: Done  56 tasks      | elapsed:   34.3s
+[Parallel(n_jobs=8)]: Done  69 tasks      | elapsed:   38.9s
+[Parallel(n_jobs=8)]: Done  82 tasks      | elapsed:   48.4s
+[Parallel(n_jobs=8)]: Done  97 tasks      | elapsed:   57.2s
+[Parallel(n_jobs=8)]: Done 112 tasks      | elapsed:  1.1min
+[Parallel(n_jobs=8)]: Done 129 tasks      | elapsed:  1.3min
+[Parallel(n_jobs=8)]: Done 146 tasks      | elapsed:  1.6min
+[Parallel(n_jobs=8)]: Done 165 tasks      | elapsed:  1.9min
+[Parallel(n_jobs=8)]: Done 184 tasks      | elapsed:  2.2min
+[Parallel(n_jobs=8)]: Done 205 tasks      | elapsed:  2.5min
+[Parallel(n_jobs=8)]: Done 226 tasks      | elapsed:  2.8min
+[Parallel(n_jobs=8)]: Done 249 tasks      | elapsed:  3.1min
+[Parallel(n_jobs=8)]: Done 272 tasks      | elapsed:  3.6min
+[Parallel(n_jobs=8)]: Done 297 tasks      | elapsed:  4.3min
+[Parallel(n_jobs=8)]: Done 322 tasks      | elapsed:  5.2min
+[Parallel(n_jobs=8)]: Done 349 tasks      | elapsed:  6.3min
+[Parallel(n_jobs=8)]: Done 376 tasks      | elapsed:  7.8min
+[Parallel(n_jobs=8)]: Done 405 tasks      | elapsed:  9.1min
+[Parallel(n_jobs=8)]: Done 434 tasks      | elapsed: 10.6min
+[Parallel(n_jobs=8)]: Done 465 tasks      | elapsed: 12.3min
+[Parallel(n_jobs=8)]: Done 496 tasks      | elapsed: 13.8min
+[Parallel(n_jobs=8)]: Done 529 tasks      | elapsed: 15.3min
+[Parallel(n_jobs=8)]: Done 562 tasks      | elapsed: 16.8min
+[Parallel(n_jobs=8)]: Done 597 tasks      | elapsed: 18.8min
+[Parallel(n_jobs=8)]: Done 632 tasks      | elapsed: 20.4min
+[Parallel(n_jobs=8)]: Done 669 tasks      | elapsed: 21.8min
+[Parallel(n_jobs=8)]: Done 706 tasks      | elapsed: 23.3min
+[Parallel(n_jobs=8)]: Done 745 tasks      | elapsed: 25.2min
+[Parallel(n_jobs=8)]: Done 784 tasks      | elapsed: 27.3min
+[Parallel(n_jobs=8)]: Done 800 out of 800 | elapsed: 28.1min finished
+Tiempo del barrido: 28.1 min
+
+
+Listo en 28.1 min. Resultados en: C:\users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo2_jerarquico\N256_K20_runs40_t1500

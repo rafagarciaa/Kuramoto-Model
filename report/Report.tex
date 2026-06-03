@@ -1,0 +1,138 @@
+% =============================================================================
+% Report - Plantilla limpia basada en REVTeX 4.2
+% Sistemas Complejos - Universidad de Granada
+% =============================================================================
+%
+% Compilacion:
+%   latexmk -pdf Report.tex      (o el boton Build de LaTeX Workshop)
+%
+% Para alternar entre dos formatos:
+%   reprint  -> doble columna, estilo articulo final (default).
+%   preprint -> una columna, mas margen, util para borradores.
+
+\documentclass[
+  reprint,
+  amsmath,amssymb,
+  aps,
+  pra,            % journal especifico: elimina el warning "No journal specified"
+  %nofootinbib,
+  %floatfix,
+]{revtex4-2}
+
+% --- Paquetes ----------------------------------------------------------------
+\usepackage[utf8]{inputenc}                % acentos en el .tex
+\usepackage[spanish,es-tabla]{babel}       % titulos y captions en espanol
+\usepackage{graphicx}                      % \includegraphics
+\usepackage{bm}                            % negrita en math
+\usepackage{dcolumn}                       % alinear columnas por decimal
+\usepackage{hyperref}                      % links clicables
+\usepackage[capitalise]{cleveref}          % \cref inteligente (carga DESPUES de hyperref)
+
+% Carpeta donde estan las figuras (opcional; ajusta o quita si las pones aqui mismo).
+\graphicspath{{figs/}{../resultados/}}
+
+% =============================================================================
+% Frontmatter
+% =============================================================================
+\begin{document}
+
+\title{Modelo de Kuramoto: sincronizaci\'on colectiva en sistemas complejos}
+
+\author{Martín Iturralde Jara}
+\author{Rafael García Millán}
+ \email{nose@correo.ugr.es}
+ \email{rgm220703@correo.ugr.es}
+\affiliation{Universidad de Granada, Facultad de Ciencias}
+
+\date{\today}
+
+\begin{abstract}
+Resumen del trabajo: una o dos frases con el problema, otra con el m\'etodo
+y otra con el resultado principal. Evita ecuaciones y referencias aqu\'i.
+\end{abstract}
+
+\maketitle
+
+
+% =============================================================================
+% 1. Introduccion
+% =============================================================================
+\section{Introducci\'on}
+\label{sec:intro}
+
+Contexto del modelo de Kuramoto, su relevancia y motivaci\'on del trabajo.
+% Cuando tengas entradas en ReportNotes.bib, cita asi:
+%   Cita a~\cite{acebron2005} para introducir el modelo de campo medio.
+
+
+% =============================================================================
+% 2. Modelo y metodos numericos
+% =============================================================================
+\section{Modelo y m\'etodos}
+\label{sec:metodos}
+
+La dinámica viene dada por
+\begin{equation}
+  \dot{\theta}_i(t) = \omega_i + K \sum_{j=1}^{N} A_{ij}\,\sin(\theta_j - \theta_i),
+  \label{eq:kuramoto}
+\end{equation}
+donde el parámetro de orden complejo se define como
+\begin{equation}
+  R(t)\,e^{i\Psi(t)} = \frac{1}{N}\sum_{j=1}^{N} e^{i\theta_j(t)}.
+  \label{eq:R}
+\end{equation}
+
+Detalles de la integración (Euler explícito, parada por convergencia, etc.).
+
+
+% =============================================================================
+% 3. Resultados
+% =============================================================================
+\section{Resultados}
+\label{sec:resultados}
+
+\subsection{Tarea 1: transici\'on cl\'asica de Kuramoto}
+\label{sec:tarea1}
+
+% --- Ejemplo de figura. Descomenta y ajusta el path cuando tengas el .png:
+% \begin{figure}[ht]
+%   \centering
+%   \includegraphics[width=\columnwidth]{R_vs_K.png}
+%   \caption{$\langle R\rangle$ frente a $K$ para distintos $\sigma$.}
+%   \label{fig:tarea1_R}
+% \end{figure}
+% Referenciala con: en \cref{fig:tarea1_R} se observa\dots
+
+\subsection{Tarea 2: red modular}
+\label{sec:tarea2}
+
+\subsection{Tarea 3: estructura jer\'arquica}
+\label{sec:tarea3}
+
+\subsection{Tarea 4: hacia redes tipo cerebro}
+\label{sec:tarea4}
+
+
+% =============================================================================
+% 4. Discusion y conclusiones
+% =============================================================================
+\section{Discusi\'on y conclusiones}
+\label{sec:conclusiones}
+
+
+% =============================================================================
+% Agradecimientos (opcional)
+% =============================================================================
+\begin{acknowledgments}
+% Texto de agradecimientos, financiacion, etc.
+\end{acknowledgments}
+
+
+% =============================================================================
+% Bibliografia
+% =============================================================================
+% Las entradas viven en ReportNotes.bib. Se compila con bibtex (latexmk lo
+% lanza solo). Cita con \cite{clave} o \cref{eq:...} para ecuaciones/figuras.
+\bibliography{ReportNotes}
+
+\end{document}

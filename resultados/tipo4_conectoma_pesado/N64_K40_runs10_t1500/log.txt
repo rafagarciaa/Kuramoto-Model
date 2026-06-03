@@ -1,0 +1,76 @@
+Log de ejecucion - 2026-06-02 19:17:38
+============================================================
+
+sim_type = 4  (tipo4_conectoma_pesado)
+Resultados: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo4_conectoma_pesado\N64_K40_runs10_t1500
+
+Conectoma preparado: intervalos (n_levels=5, log_transform=True; 5 valores distintos en W)
+  shape=(90, 90), |E_nonzero|=180, max(W)=1, max(strength)=2.25
+
+--- Barrido CONECTOMA pesado ---
+Barrido: 1 sigmas x 40 K x 10 runs = 400 simulaciones
+  Niveles: 1  (grupos por nivel: [2])
+  Parada: block_size=1000, conv_threshold=0.001, max_steps=60000
+  Workers (n_jobs): 14
+
+Lanzando 400 simulaciones en paralelo...
+[Parallel(n_jobs=14)]: Using backend LokyBackend with 14 concurrent workers.
+[Parallel(n_jobs=14)]: Done   4 tasks      | elapsed:    3.4s
+[Parallel(n_jobs=14)]: Done  13 tasks      | elapsed:    5.7s
+[Parallel(n_jobs=14)]: Done  22 tasks      | elapsed:    7.1s
+[Parallel(n_jobs=14)]: Done  33 tasks      | elapsed:    9.4s
+[Parallel(n_jobs=14)]: Done  44 tasks      | elapsed:   10.5s
+[Parallel(n_jobs=14)]: Done  57 tasks      | elapsed:   12.3s
+[Parallel(n_jobs=14)]: Done  70 tasks      | elapsed:   14.2s
+[Parallel(n_jobs=14)]: Done  85 tasks      | elapsed:   16.9s
+[Parallel(n_jobs=14)]: Done 100 tasks      | elapsed:   18.2s
+[Parallel(n_jobs=14)]: Done 117 tasks      | elapsed:   20.7s
+[Parallel(n_jobs=14)]: Done 134 tasks      | elapsed:   22.4s
+[Parallel(n_jobs=14)]: Done 153 tasks      | elapsed:   25.3s
+[Parallel(n_jobs=14)]: Done 172 tasks      | elapsed:   27.6s
+[Parallel(n_jobs=14)]: Done 193 tasks      | elapsed:   30.7s
+[Parallel(n_jobs=14)]: Done 214 tasks      | elapsed:   33.5s
+[Parallel(n_jobs=14)]: Done 237 tasks      | elapsed:   38.1s
+[Parallel(n_jobs=14)]: Done 260 tasks      | elapsed:   43.5s
+[Parallel(n_jobs=14)]: Done 285 tasks      | elapsed:   50.8s
+[Parallel(n_jobs=14)]: Done 310 tasks      | elapsed:   54.9s
+[Parallel(n_jobs=14)]: Done 337 tasks      | elapsed:   56.7s
+[Parallel(n_jobs=14)]: Done 364 tasks      | elapsed:   57.5s
+[Parallel(n_jobs=14)]: Done 400 out of 400 | elapsed:  1.0min finished
+Tiempo del barrido: 1.0 min
+
+
+--- Barrido ALEATORIA (misma strength) ---
+Barrido: 1 sigmas x 40 K x 10 runs = 400 simulaciones
+  Niveles: 1  (grupos por nivel: [2])
+  Parada: block_size=1000, conv_threshold=0.001, max_steps=60000
+  Workers (n_jobs): 14
+
+Lanzando 400 simulaciones en paralelo...
+[Parallel(n_jobs=14)]: Using backend LokyBackend with 14 concurrent workers.
+[Parallel(n_jobs=14)]: Done   4 tasks      | elapsed:    1.7s
+[Parallel(n_jobs=14)]: Done  13 tasks      | elapsed:    3.7s
+[Parallel(n_jobs=14)]: Done  22 tasks      | elapsed:    5.4s
+[Parallel(n_jobs=14)]: Done  33 tasks      | elapsed:    7.6s
+[Parallel(n_jobs=14)]: Done  44 tasks      | elapsed:    9.5s
+[Parallel(n_jobs=14)]: Done  57 tasks      | elapsed:   13.2s
+[Parallel(n_jobs=14)]: Done  70 tasks      | elapsed:   15.6s
+[Parallel(n_jobs=14)]: Done  85 tasks      | elapsed:   17.7s
+[Parallel(n_jobs=14)]: Done 100 tasks      | elapsed:   20.5s
+[Parallel(n_jobs=14)]: Done 117 tasks      | elapsed:   22.8s
+[Parallel(n_jobs=14)]: Done 134 tasks      | elapsed:   24.3s
+[Parallel(n_jobs=14)]: Done 153 tasks      | elapsed:   26.2s
+[Parallel(n_jobs=14)]: Done 172 tasks      | elapsed:   29.5s
+[Parallel(n_jobs=14)]: Done 193 tasks      | elapsed:   32.1s
+[Parallel(n_jobs=14)]: Done 214 tasks      | elapsed:   36.4s
+[Parallel(n_jobs=14)]: Done 237 tasks      | elapsed:   39.7s
+[Parallel(n_jobs=14)]: Done 260 tasks      | elapsed:   43.5s
+[Parallel(n_jobs=14)]: Done 285 tasks      | elapsed:   44.8s
+[Parallel(n_jobs=14)]: Done 310 tasks      | elapsed:   45.6s
+[Parallel(n_jobs=14)]: Done 337 tasks      | elapsed:   46.0s
+[Parallel(n_jobs=14)]: Done 364 tasks      | elapsed:   46.3s
+[Parallel(n_jobs=14)]: Done 400 out of 400 | elapsed:   47.1s finished
+Tiempo del barrido: 0.8 min
+
+
+Listo en 1.9 min. Resultados en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo4_conectoma_pesado\N64_K40_runs10_t1500

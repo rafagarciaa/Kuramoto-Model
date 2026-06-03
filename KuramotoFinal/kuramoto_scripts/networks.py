@@ -157,24 +157,46 @@ def crear_matriz_jerarquica(N, submodules_per_module,
     if rng is None:
         rng = np.random.default_rng()
 
-    n_modules  = len(submodules_per_module)
-    total_subs = int(sum(submodules_per_module))
-    tam_sub    = N // total_subs
+    n_modules = len(submodules_per_module)
 
     module_id    = np.zeros(N, dtype=np.int64)
     submodule_id = np.zeros(N, dtype=np.int64)
 
-    # Asignacion secuencial de nodos a submodulos y modulos.
+    # Reparto en cascada en DOS niveles para que los modulos sean del
+    # mismo tamano y, DENTRO de cada modulo, sus submodulos tambien lo sean:
+    #
+    #   1) N se reparte equitativamente entre los n_modules.
+    #      El ultimo modulo absorbe el resto si N no es divisible.
+    #   2) Dentro de cada modulo, sus nodos se reparten equitativamente
+    #      entre sus submodules_per_module[m] submodulos.
+    #      El ultimo submodulo del modulo absorbe su resto.
+    #
+    # Asi, modulos con distinto numero de submodulos seguiran teniendo el
+    # mismo numero de nodos; lo que cambia es el tamano interno de cada
+    # submodulo.
+
+    tam_modulo = N // n_modules
     sub_global = 0
     nodo = 0
     for m in range(n_modules):
-        for _s in range(submodules_per_module[m]):
-            ultimo = (m == n_modules - 1) and (_s == submodules_per_module[m] - 1)
-            fin = N if ultimo else nodo + tam_sub
-            submodule_id[nodo:fin] = sub_global
-            module_id[nodo:fin]    = m
-            nodo = fin
+        # Nodos asignados a este modulo (el ultimo absorbe el resto).
+        es_ultimo_modulo = (m == n_modules - 1)
+        fin_modulo = N if es_ultimo_modulo else nodo + tam_modulo
+        nodos_modulo = fin_modulo - nodo
+        module_id[nodo:fin_modulo] = m
+
+        # Dentro del modulo, reparto entre sus submodulos.
+        n_subs = submodules_per_module[m]
+        tam_sub = nodos_modulo // n_subs
+        nodo_sub = nodo
+        for s in range(n_subs):
+            es_ultimo_sub = (s == n_subs - 1)
+            fin_sub = fin_modulo if es_ultimo_sub else nodo_sub + tam_sub
+            submodule_id[nodo_sub:fin_sub] = sub_global
+            nodo_sub = fin_sub
             sub_global += 1
+
+        nodo = fin_modulo
 
     # Nivel 2: intra-submodulo denso.
     A = np.zeros((N, N), dtype=np.float64)

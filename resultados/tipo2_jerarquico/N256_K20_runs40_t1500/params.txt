@@ -1,0 +1,22 @@
+Parametros de la ejecucion
+========================================
+sim_type                  = 2
+max_steps                 = 60000
+general.N                 = 256
+general.dt                = 0.025
+general.n_runs            = 40
+general.n_jobs            = 8
+general.seed              = 42
+convergence.block_size    = 250
+convergence.conv_threshold = 0.001
+convergence.t_max         = 1500.0
+K_sweep.n_K               = 20
+K_sweep.K_width_factor    = 0.2
+tipo2_hierarchical.submodules_per_module = [3, 2, 4]
+tipo2_hierarchical.p_intra_submodule = 1.0
+tipo2_hierarchical.n_edges_inter_submodule = 1
+tipo2_hierarchical.n_edges_inter_module = 1
+tipo2_hierarchical.sigma  = 1.0
+tipo2_hierarchical.K_min  = 0.005
+tipo2_hierarchical.K_max  = None
+tipo2_hierarchical.K_center = None

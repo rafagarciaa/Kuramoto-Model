@@ -47,8 +47,8 @@ def K_values_tstudent(num_K, K_min, K_max, Kc, width_factor=0.3, df=2):
     sigma_K = width_factor * Kc
 
     # Invertimos la CDF: uniforme en [u_min, u_max] -> K no uniforme.
-    u_min = t_dist.cdf(K_min, df=df, loc=Kc, scale=sigma_K)
-    u_max = t_dist.cdf(K_max, df=df, loc=Kc, scale=sigma_K)
+    u_min = t_dist.cdf(K_min, df=df, loc=1.05 * Kc, scale=sigma_K)
+    u_max = t_dist.cdf(K_max, df=df, loc=1.05 * Kc, scale=sigma_K)
 
     u_values = np.linspace(u_min, u_max, num_K)
 

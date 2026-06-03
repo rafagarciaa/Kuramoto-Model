@@ -21,6 +21,7 @@ os.environ.setdefault('NUMEXPR_NUM_THREADS', '1')
 
 import time
 import numpy as np
+from scipy.optimize import curve_fit
 
 from kuramoto_scripts import (
     load_params,
@@ -29,11 +30,60 @@ from kuramoto_scripts import (
     generar_ICs, generar_ICs_por_sigma,
     generar_As_modular, generar_As_jerarquica,
     cargar_y_preparar_A, hemisferio_ids, randomize_preserving_degree,
+    prepare_W_real, prepare_W_intervalos, randomize_preserving_strength,
     crear_carpeta_resultados, guardar_params_txt,
     iniciar_log, cerrar_log, _ruta,
     plot_mean_field, plot_modular, plot_hierarchical, plot_connectome,
     plot_scaling_Kc, plot_matriz_adyacencia,
 )
+
+# Exponente teorico FSS para Kuramoto campo medio con g(omega) Gaussiana
+# (Hong, Chate, Park PRL 2007). El metodo "linear_invN" asume alpha=1
+# (lineal en 1/N) y es robusto al ruido pero sesgado. El metodo
+# "powerlaw_2_5" usa el alpha correcto pero amplifica el ruido cuando
+# los Kc(N) tienen dispersion comparable al shift residual.
+ALPHA_PL = 2.0 / 5.0
+
+
+def _fit_powerlaw(N_arr, Kc_arr, alpha=ALPHA_PL):
+    """Ajusta Kc(N) = Kc_inf + a * N^(-alpha) con alpha FIJO.
+
+    Devuelve (Kc_inf, a) o (NaN, NaN) si el fit falla."""
+    def model(N, kc_inf, a):
+        return kc_inf + a * np.power(N, -alpha)
+    p0 = [float(Kc_arr[-1]), float(Kc_arr[0] - Kc_arr[-1])]
+    try:
+        popt, _ = curve_fit(model, N_arr, Kc_arr, p0=p0, maxfev=5000)
+        return popt
+    except Exception:
+        return np.array([np.nan, np.nan])
+
+
+def _fit_powerlaw_free(N_arr, Kc_arr):
+    """Ajusta Kc(N) = Kc_inf + a * N^(-alpha) con alpha LIBRE.
+
+    Devuelve (Kc_inf, a, alpha) o (NaN, NaN, NaN). Requiere >=4 puntos N
+    para que el fit tenga grados de libertad. alpha esta acotado a
+    [0.05, 2.0] para evitar fugar a extremos sin sentido fisico.
+    """
+    if len(N_arr) < 4:
+        return np.array([np.nan, np.nan, np.nan])
+    def model(N, kc_inf, a, alpha):
+        return kc_inf + a * np.power(N, -alpha)
+    p0 = [float(Kc_arr[-1]), float(Kc_arr[0] - Kc_arr[-1]), ALPHA_PL]
+    try:
+        popt, _ = curve_fit(model, N_arr, Kc_arr, p0=p0,
+                            bounds=([0.0, -np.inf, 0.05],
+                                    [np.inf, np.inf, 2.0]),
+                            maxfev=10000)
+        return popt
+    except Exception:
+        return np.array([np.nan, np.nan, np.nan])
+
+
+def _fmt(v, spec='.4f'):
+    """Formatea un float, devolviendo 'n/a' si no es finito."""
+    return f"{v:{spec}}" if np.isfinite(v) else "n/a"
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(AQUI, 'data')
@@ -106,27 +156,78 @@ def run_tipo0(p, run_dir):
             Kc_per_N[i, k] = Kc_experimental(K_grid[i], outk['R_sigma'][i], log=False)
         out_full = outk  # el ultimo (N completa) se usa para las graficas estandar
 
+    # --- Calculamos los TRES ajustes FSS. ---
+    # El usuario los compara visualmente en el plot (2 paneles fijos:
+    # 1/N y N^(-2/5)) y numericamente en la tabla. fss_method en params.json
+    # selecciona cual es "el oficial" (cual va a Kc_inf):
+    #   "linear_invN"   -> alpha = 1     (lineal en 1/N, bajo varianza, sesgado)
+    #   "powerlaw_2_5"  -> alpha = 2/5   (Hong 2007, teorico)
+    #   "powerlaw_free" -> alpha libre   (ajustado a partir de los datos)
     inv_N = 1.0 / np.array(N_values, dtype=float)
-    lines, Kc_inf = [], np.zeros(s0.n_sigmas)
-    for i in range(s0.n_sigmas):
-        slope, intercept = np.polyfit(inv_N, Kc_per_N[i], 1)  # Kc ~ slope*(1/N) + intercept
-        lines.append((slope, intercept))
-        Kc_inf[i] = intercept                                 # corte en 1/N = 0
+    N_arr = np.array(N_values, dtype=float)
 
-    # Tabla comparativa.
-    print("\n" + "=" * 56)
-    print(f"{'sigma':>6} | {'Kc teorico':>11} | {'Kc(N max)':>10} | {'Kc inf':>8}")
-    print("-" * 56)
+    fits_lin  = np.zeros((s0.n_sigmas, 2))          # (Kc_inf, slope_en_1/N)
+    fits_pl   = np.zeros((s0.n_sigmas, 2))          # (Kc_inf, a) para alpha=2/5
+    fits_free = np.zeros((s0.n_sigmas, 3))          # (Kc_inf, a, alpha) libre
+    for i in range(s0.n_sigmas):
+        slope, intercept = np.polyfit(inv_N, Kc_per_N[i], 1)
+        fits_lin[i]  = (intercept, slope)           # Kc = intercept + slope/N
+        fits_pl[i]   = _fit_powerlaw(N_arr, Kc_per_N[i], alpha=ALPHA_PL)
+        fits_free[i] = _fit_powerlaw_free(N_arr, Kc_per_N[i])
+
+    fss_method = getattr(s0, 'fss_method', 'linear_invN')
+    Kc_inf_by_method = {
+        'linear_invN':   fits_lin[:, 0],
+        'powerlaw_2_5':  fits_pl[:, 0],
+        'powerlaw_free': fits_free[:, 0],
+    }
+    if fss_method not in Kc_inf_by_method:
+        print(f"AVISO: fss_method='{fss_method}' desconocido, uso 'linear_invN'.")
+        fss_method = 'linear_invN'
+    Kc_inf = Kc_inf_by_method[fss_method]
+
+    # Estrella en la columna del metodo oficial.
+    star = {'linear_invN':   ('*', ' ', ' '),
+            'powerlaw_2_5':  (' ', '*', ' '),
+            'powerlaw_free': (' ', ' ', '*')}[fss_method]
+
+    print(f"\nFSS method oficial: '{fss_method}'  (marcado con * en la tabla)")
+    print("=" * 108)
+    print(f"{'sigma':>6} | {'Kc th':>7} | {'Kc(Nmax)':>9} | "
+          f"{'Kc 1/N'+star[0]:>9} | {'err%':>5} | "
+          f"{'Kc 2/5'+star[1]:>9} | {'err%':>5} | "
+          f"{'Kc free'+star[2]:>10} | {'err%':>5} | "
+          f"{'alpha':>6} | {'err(a)%':>8}")
+    print("-" * 108)
     for i, sigma in enumerate(sigmas):
-        print(f"{sigma:>6.2f} | {Kc_teorica(sigma):>11.4f} | "
-              f"{Kc_per_N[i, -1]:>10.4f} | {Kc_inf[i]:>8.4f}")
-    print("=" * 56)
+        Kc_th = Kc_teorica(sigma)
+        e_lin  = 100.0 * abs(fits_lin[i, 0] - Kc_th) / Kc_th
+        e_pl   = (100.0 * abs(fits_pl[i, 0]   - Kc_th) / Kc_th
+                  if np.isfinite(fits_pl[i, 0])   else float('nan'))
+        e_free = (100.0 * abs(fits_free[i, 0] - Kc_th) / Kc_th
+                  if np.isfinite(fits_free[i, 0]) else float('nan'))
+        alpha_fit = fits_free[i, 2]
+        e_alpha   = (100.0 * abs(alpha_fit - ALPHA_PL) / ALPHA_PL
+                     if np.isfinite(alpha_fit) else float('nan'))
+        print(f"{sigma:>6.2f} | {Kc_th:>7.4f} | {Kc_per_N[i, -1]:>9.4f} | "
+              f"{fits_lin[i, 0]:>9.4f} | {e_lin:>4.2f}% | "
+              f"{_fmt(fits_pl[i, 0]):>9} | {_fmt(e_pl, '.2f'):>4}% | "
+              f"{_fmt(fits_free[i, 0]):>10} | {_fmt(e_free, '.2f'):>4}% | "
+              f"{_fmt(alpha_fit, '.3f'):>6} | {_fmt(e_alpha, '.2f'):>7}%")
+    print("=" * 108)
 
     _guardar(run_dir, K_grid, out_full, extra={
-        'sigmas': sigmas, 'N_values': np.array(N_values), 'inv_N': inv_N,
-        'Kc_per_N': Kc_per_N, 'Kc_inf': Kc_inf})
+        'sigmas': sigmas, 'N_values': N_arr, 'inv_N': inv_N,
+        'Kc_per_N': Kc_per_N, 'Kc_inf': Kc_inf,
+        'fss_method': fss_method,
+        'fits_linear_invN':   fits_lin,
+        'fits_powerlaw_2_5':  fits_pl,
+        'fits_powerlaw_free': fits_free,
+        'alpha_teorico': ALPHA_PL,
+    })
     plot_mean_field(K_grid, sigmas, out_full, g.N, g.n_runs, run_dir)
-    plot_scaling_Kc(inv_N, N_values, Kc_per_N, Kc_inf, lines, sigmas, run_dir)
+    plot_scaling_Kc(N_arr, Kc_per_N, fits_lin, fits_pl, sigmas, run_dir,
+                    fss_method=fss_method, fits_free=fits_free)
 
 
 # ============================================================================
@@ -244,12 +345,105 @@ def run_tipo3(p, run_dir):
 
 
 # ============================================================================
+# Tipo 4: conectoma con pesos (vs aleatoria que conserva strength)
+# ============================================================================
+
+def run_tipo4(p, run_dir):
+    """Conectoma con pesos. K es solo multiplicador escalar sobre la matriz
+    de pesos W. Dos preparaciones disponibles:
+
+       approximation = "matriz_real" -> W = promedio de los 88 sujetos,
+                                        diagonal=0, valores brutos.
+       approximation = "intervalos"  -> W normalizada (con log_transform
+                                        opcional) y aproximada a n_levels
+                                        valores en {0, 1/(n-1), ..., 1}.
+
+    Comparacion con red aleatoria que preserva strength por nodo (4-cycle
+    swap). Si la modularidad jerarquica del cerebro potencia la
+    metaestabilidad, sigma_R deberia ser mayor en el conectoma que en
+    su version aleatoria con misma strength.
+    """
+    g, c, ks, s4 = p.general, p.convergence, p.K_sweep, p.tipo4_connectome_weighted
+    ruta_mat = os.path.join(DATA, s4.mat_file)
+
+    # --- Preparar matriz de pesos W segun el modo elegido ---
+    approx = getattr(s4, 'approximation', 'matriz_real')
+    if approx == 'intervalos':
+        n_levels      = getattr(s4, 'n_levels', 5)
+        log_transform = bool(getattr(s4, 'log_transform', True))
+        W = prepare_W_intervalos(ruta_mat, n_levels, log_transform=log_transform)
+        n_distintos = int(len(np.unique(W)))
+        descripcion = (f"intervalos (n_levels={n_levels}, "
+                       f"log_transform={log_transform}; "
+                       f"{n_distintos} valores distintos en W)")
+    elif approx == 'matriz_real':
+        W = prepare_W_real(ruta_mat)
+        descripcion = "matriz real (valores brutos)"
+    else:
+        raise ValueError(f"approximation='{approx}' desconocido. "
+                         "Usa 'matriz_real' o 'intervalos'.")
+
+    N = W.shape[0]
+    n_nonzero = int((W != 0).sum() // 2)
+    strength_max = float(W.sum(axis=1).max())
+    print(f"Conectoma preparado: {descripcion}")
+    print(f"  shape={W.shape}, |E_nonzero|={n_nonzero}, "
+          f"max(W)={W.max():.4g}, max(strength)={strength_max:.4g}")
+
+    hemi = hemisferio_ids(os.path.join(DATA, 'AAL_regions.csv'))
+    level_ids = [hemi]
+
+    # --- K-grid: K es solo multiplicador, asi que el rango es el habitual ---
+    K_max = s4.K_max if s4.K_max is not None else _K_max_estable(W, g.dt)
+    K_grid = K_values_log_tstudent(ks.n_K, s4.K_min, K_max,
+                                   s4.K_center, ks.K_width_factor)[None, :]
+    sigmas = np.array([s4.sigma])
+
+    # ICs compartidas entre conectoma y aleatoria (comparacion justa).
+    omegas_IC, thetas_IC = generar_ICs(g.n_runs, N, s4.sigma, seed=g.seed)
+    omegas_IC, thetas_IC = omegas_IC[None, ...], thetas_IC[None, ...]
+
+    # Matrices por run: conectoma fijo; aleatoria = una randomizacion por run.
+    rng = np.random.default_rng(g.seed)
+    W_runs_conn = [W for _ in range(g.n_runs)]
+    n_swaps_factor = getattr(s4, 'n_swaps_factor', 20)
+    W_runs_rand = [randomize_preserving_strength(W, n_swaps_factor, rng)
+                   for _ in range(g.n_runs)]
+
+    # Plots de la matriz W (no binaria -> el vmax adapta automaticamente).
+    plot_matriz_adyacencia(W, hemi, _ruta(run_dir, 'W_conectoma.png'),
+                           titulo=fr'Conectoma {approx}  $N={N}$')
+    plot_matriz_adyacencia(W_runs_rand[0], hemi,
+                           _ruta(run_dir, 'W_aleatoria.png'),
+                           titulo=fr'Aleatoria misma strength  $N={N}$')
+
+    print("\n--- Barrido CONECTOMA pesado ---")
+    out_conn = barrido(N, g.dt, p.max_steps, c.block_size, c.conv_threshold,
+                       K_grid, sigmas, g.n_runs, omegas_IC, thetas_IC,
+                       A_runs=W_runs_conn, level_ids=level_ids, n_jobs=g.n_jobs)
+    print("\n--- Barrido ALEATORIA (misma strength) ---")
+    out_rand = barrido(N, g.dt, p.max_steps, c.block_size, c.conv_threshold,
+                       K_grid, sigmas, g.n_runs, omegas_IC, thetas_IC,
+                       A_runs=W_runs_rand, level_ids=level_ids, n_jobs=g.n_jobs)
+
+    _guardar(run_dir, K_grid, out_conn,
+             extra={'approximation': approx, 'K_max': K_max,
+                    'strength_max': strength_max,
+                    'rand_R_mean':  out_rand['R_mean'],
+                    'rand_R_sigma': out_rand['R_sigma'],
+                    'rand_R_err':   out_rand['R_err']})
+    plot_connectome(K_grid, out_conn, out_rand, N, g.n_runs, run_dir)
+
+
+# ============================================================================
 # Main
 # ============================================================================
 
-DISPATCH = {0: run_tipo0, 1: run_tipo1, 2: run_tipo2, 3: run_tipo3}
-SUBDIR   = {0: 'tipo0_campo_medio', 1: 'tipo1_modular',
-            2: 'tipo2_jerarquico', 3: 'tipo3_conectoma'}
+DISPATCH = {0: run_tipo0, 1: run_tipo1, 2: run_tipo2,
+            3: run_tipo3, 4: run_tipo4}
+SUBDIR   = {0: 'tipo0_campo_medio',     1: 'tipo1_modular',
+            2: 'tipo2_jerarquico',      3: 'tipo3_conectoma',
+            4: 'tipo4_conectoma_pesado'}
 
 
 def main():

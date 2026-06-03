@@ -1,0 +1,21 @@
+Parametros de la ejecucion
+========================================
+sim_type                  = 3
+max_steps                 = 60000
+general.N                 = 64
+general.dt                = 0.025
+general.n_runs            = 10
+general.n_jobs            = 12
+general.seed              = None
+convergence.block_size    = 500
+convergence.conv_threshold = 0.001
+convergence.t_max         = 1500.0
+K_sweep.n_K               = 50
+K_sweep.K_width_factor    = 0.2
+tipo3_connectome.mat_file = SCmatrices88healthy.mat
+tipo3_connectome.threshold = 0.001
+tipo3_connectome.n_swaps_factor = 10
+tipo3_connectome.sigma    = 1.0
+tipo3_connectome.K_min    = 0.005
+tipo3_connectome.K_max    = None
+tipo3_connectome.K_center = None

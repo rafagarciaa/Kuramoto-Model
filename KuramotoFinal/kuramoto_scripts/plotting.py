@@ -149,42 +149,160 @@ def plot_mean_field(K_grid, sigmas, out, N, n_runs, save_dir):
 # sim_type 0 con scaling: extrapolacion de Kc a N->inf (1/N -> 0)
 # ----------------------------------------------------------------------------
 
-def plot_scaling_Kc(inv_N, N_values, Kc_per_N, Kc_inf, lines, sigmas, save_dir):
-    """Finite-size scaling: Kc(N) vs 1/N + recta extrapolada a 1/N=0.
+def _draw_panel_fss(ax, N_arr, Kc_per_N, fits, sigmas, alpha, title_method, marked):
+    """Helper: dibuja Kc(N) vs N^(-alpha) y la recta de ajuste por sigma.
 
-    inv_N     : (n_N,)               -> 1/N de cada tamaño.
-    Kc_per_N  : (n_sigmas, n_N)      -> Kc experimental para cada (sigma, N).
-    Kc_inf    : (n_sigmas,)          -> corte de la recta en 1/N=0.
-    lines     : lista de (pendiente, ordenada) por sigma.
+    En el eje x = N^(-alpha), el modelo Kc = Kc_inf + a*N^(-alpha) es una
+    recta, asi que la calidad del ajuste se ve A SIMPLE VISTA: si los puntos
+    se desvian de la recta, esa ley no es la correcta.
+
+    Uso UN SOLO alpha para los tres sigmas (panel izquierdo y central de
+    plot_scaling_Kc). El panel de alpha libre usa la variante per-sigma:
+    ver _draw_panel_fss_free.
     """
-    setup_plot_style()
-    fig, ax = plt.subplots(figsize=(8, 5.6))
     colors = plt.cm.viridis(np.linspace(0.15, 0.85, len(sigmas)))
-    x_fit = np.array([0.0, float(np.max(inv_N))])
+    x_data = N_arr ** (-alpha)
+    x_max  = float(x_data.max())
+    x_fit  = np.linspace(0.0, x_max * 1.05, 200)
 
     for i, sigma in enumerate(sigmas):
         c = colors[i]
-        slope, intercept = lines[i]
-        # Puntos Kc(N).
-        ax.plot(inv_N, Kc_per_N[i], 'o', ms=6, color=c)
-        # Recta de ajuste, extendida hasta 1/N = 0.
-        ax.plot(x_fit, intercept + slope * x_fit, '--', lw=1.3, color=c)
-        # Punto extrapolado en 1/N = 0.
-        ax.plot(0.0, Kc_inf[i], '*', ms=15, color=c, zorder=5)
-        # Kc teorico de referencia.
-        Kc_th = Kc_teorica(sigma)
-        ax.axhline(Kc_th, ls=':', lw=1.0, color=c, alpha=0.5)
-        ax.plot([], [], '-', color=c,
-                label=fr'$\sigma={sigma:.2f}$: $K_c^\infty={Kc_inf[i]:.3f}$, '
-                      fr'$K_c^{{th}}={Kc_th:.3f}$')
+        Kc_inf_i, a_i = fits[i]
+        ax.plot(x_data, Kc_per_N[i], 'o', ms=6, color=c)
+        if np.isfinite(Kc_inf_i):
+            ax.plot(x_fit, Kc_inf_i + a_i * x_fit, '--', lw=1.3, color=c)
+            ax.plot(0.0, Kc_inf_i, '*', ms=15, color=c, zorder=5)
+            Kc_th = Kc_teorica(sigma)
+            err = 100.0 * abs(Kc_inf_i - Kc_th) / Kc_th
+            ax.axhline(Kc_th, ls=':', lw=1.0, color=c, alpha=0.5)
+            ax.plot([], [], '-', color=c,
+                    label=fr'$\sigma={sigma:.2f}$: '
+                          fr'$K_c^\infty={Kc_inf_i:.4f}$ '
+                          fr'(err {err:.2f}\%)')
 
     ax.axvline(0.0, color='gray', lw=0.8, alpha=0.6)
-    ax.set_xlabel(r'$1/N$')
+    if abs(alpha - 1.0) < 1e-9:
+        ax.set_xlabel(r'$1/N$')
+    elif abs(alpha - 2.0/5.0) < 1e-9:
+        ax.set_xlabel(r'$N^{-2/5}$')
+    else:
+        ax.set_xlabel(rf'$N^{{-{alpha:.3f}}}$')
     ax.set_ylabel(r'$K_c$')
-    ax.set_xlim(left=-0.02 * float(np.max(inv_N)))
-    ax.set_title(r'Finite-size scaling: extrapolacion de $K_c$ a $N\to\infty$')
-    ax.legend(loc='best', title=r'$\bigstar$ = $K_c$ extrapolado ($1/N=0$)')
-    _info_box(ax, fr'$N$: {", ".join(str(n) for n in N_values)}', 'top')
+    ax.set_xlim(left=-0.02 * x_max)
+    star = r' $\bigstar$' if marked else ''
+    ax.set_title(rf'{title_method}{star}')
+    ax.legend(loc='best')
+
+
+def _draw_panel_fss_free(ax, N_arr, Kc_per_N, fits_free, sigmas, marked,
+                         alpha_ref=2.0/5.0):
+    """Panel del ajuste con alpha LIBRE. Cada sigma usa su propio alpha
+    ajustado, asi que cada serie se dibuja en su propia coordenada
+    x = N^(-alpha_sigma).
+
+    Sirve para:
+      - Ver el valor de alpha ajustado por sigma (en la leyenda).
+      - Ver el error relativo de alpha respecto al teorico alpha_ref=2/5.
+      - Confirmar visualmente que los datos caen sobre rectas (por
+        construccion, ya que alpha se ajusta justo para eso) y el Kc_inf
+        extrapolado (estrella en x=0).
+    """
+    colors = plt.cm.viridis(np.linspace(0.15, 0.85, len(sigmas)))
+    # x_max para fijar el eje: tomamos el mayor N^(-alpha_i) entre sigmas.
+    x_max_glob = 0.0
+    for i in range(len(sigmas)):
+        Kc_inf_i, a_i, alpha_i = fits_free[i]
+        if not np.isfinite(alpha_i):
+            continue
+        x_max_glob = max(x_max_glob, float((N_arr ** (-alpha_i)).max()))
+    if x_max_glob == 0.0:
+        x_max_glob = 1.0
+
+    x_fit_unit = np.linspace(0.0, x_max_glob * 1.05, 200)
+
+    for i, sigma in enumerate(sigmas):
+        c = colors[i]
+        Kc_inf_i, a_i, alpha_i = fits_free[i]
+        if not np.isfinite(alpha_i):
+            # Caso degenerado: marcamos solo los puntos en x=1/N como fallback.
+            ax.plot(N_arr ** (-1.0), Kc_per_N[i], 'o', ms=6, color=c, alpha=0.4)
+            continue
+
+        x_data = N_arr ** (-alpha_i)
+        ax.plot(x_data, Kc_per_N[i], 'o', ms=6, color=c)
+        ax.plot(x_fit_unit, Kc_inf_i + a_i * x_fit_unit, '--', lw=1.3, color=c)
+        ax.plot(0.0, Kc_inf_i, '*', ms=15, color=c, zorder=5)
+
+        Kc_th = Kc_teorica(sigma)
+        ax.axhline(Kc_th, ls=':', lw=1.0, color=c, alpha=0.5)
+        err_K = 100.0 * abs(Kc_inf_i - Kc_th) / Kc_th
+        err_a = 100.0 * abs(alpha_i - alpha_ref) / alpha_ref
+        ax.plot([], [], '-', color=c,
+                label=fr'$\sigma={sigma:.2f}$: $\alpha={alpha_i:.3f}$ '
+                      fr'(err$_\alpha$={err_a:.1f}\%), '
+                      fr'$K_c^\infty={Kc_inf_i:.4f}$ '
+                      fr'(err$_K$={err_K:.2f}\%)')
+
+    ax.axvline(0.0, color='gray', lw=0.8, alpha=0.6)
+    ax.set_xlabel(r'$N^{-\alpha}$ (cada $\sigma$ con su propio $\alpha$)')
+    ax.set_ylabel(r'$K_c$')
+    ax.set_xlim(left=-0.02 * x_max_glob)
+    star = r' $\bigstar$' if marked else ''
+    ax.set_title(rf'Power-law $\alpha$ libre{star}')
+    ax.legend(loc='best')
+
+
+def plot_scaling_Kc(N_values, Kc_per_N, fits_lin, fits_pl, sigmas, save_dir,
+                    fss_method='linear_invN', fits_free=None):
+    """Diagnostico FSS: TRES paneles para comparar leyes de escala.
+
+    Panel 1 (izquierda):  Kc(N) vs 1/N con recta del ajuste lineal en 1/N.
+        Si Kc(N) escala como 1/N, los puntos quedan alineados.
+    Panel 2 (centro):     Kc(N) vs N^(-2/5) con recta del ajuste teorico.
+        Si Kc(N) escala como N^(-2/5) (Hong 2007), los puntos se alinean aqui.
+    Panel 3 (derecha):    Kc(N) vs N^(-alpha) con alpha AJUSTADO por sigma.
+        Cada serie en su propia coordenada x. La leyenda muestra alpha_fit
+        y su error relativo respecto al teorico 2/5.
+
+    Comparando los paneles VISUALMENTE se decide cual ley describe mejor
+    los datos. La estrella senala cual metodo es el oficial.
+
+    Parametros
+    ----------
+    N_values   : array (n_N,)
+    Kc_per_N   : (n_sigmas, n_N)
+    fits_lin   : (n_sigmas, 2) -> (Kc_inf, slope) para Kc = Kc_inf + slope/N
+    fits_pl    : (n_sigmas, 2) -> (Kc_inf, a)     para Kc = Kc_inf + a*N^(-2/5)
+    fits_free  : (n_sigmas, 3) -> (Kc_inf, a, alpha) ajuste con alpha libre.
+                 Si None, se omite el tercer panel.
+    fss_method : 'linear_invN' | 'powerlaw_2_5' | 'powerlaw_free'
+    """
+    setup_plot_style()
+    N_arr = np.asarray(N_values, dtype=float)
+
+    if fits_free is None:
+        fig, axes = plt.subplots(1, 2, figsize=(15, 5.6))
+        ax1, ax2 = axes
+        ax3 = None
+    else:
+        fig, axes = plt.subplots(1, 3, figsize=(21, 5.6))
+        ax1, ax2, ax3 = axes
+
+    _draw_panel_fss(ax1, N_arr, Kc_per_N, fits_lin, sigmas,
+                    alpha=1.0, title_method=r'Lineal en $1/N$',
+                    marked=(fss_method == 'linear_invN'))
+    _draw_panel_fss(ax2, N_arr, Kc_per_N, fits_pl, sigmas,
+                    alpha=2.0/5.0, title_method=r'Power-law $\alpha=2/5$',
+                    marked=(fss_method == 'powerlaw_2_5'))
+    if ax3 is not None:
+        _draw_panel_fss_free(ax3, N_arr, Kc_per_N, fits_free, sigmas,
+                             marked=(fss_method == 'powerlaw_free'))
+
+    fig.suptitle(rf'Diagnostico FSS: comparacion de leyes de escala  '
+                 rf'($N$ = {N_arr.min():.0f}..{N_arr.max():.0f}, '
+                 rf'{len(N_arr)} puntos)',
+                 fontsize=12, y=1.00)
+    fig.tight_layout()
     fig.savefig(_ruta(save_dir, 'scaling_Kc.png'))
     plt.close(fig)
 
@@ -406,18 +524,56 @@ def plot_connectome(K_grid, out_conn, out_rand, N, n_runs, save_dir,
 # ----------------------------------------------------------------------------
 
 def plot_matriz_adyacencia(A, group_id=None, save_path=None, titulo=None):
+    """Visualiza la matriz de adyacencia.
+
+    Si `group_id` esta dado, se REORDENAN filas y columnas por grupo (via
+    np.argsort) ANTES de pintar, de modo que cada grupo aparezca contiguo
+    y se vean los bloques intra-grupo en la diagonal. Esto es puramente
+    cosmetico: la simulacion usa los indices originales.
+
+    Para matrices modulares/jerarquicas, los grupos ya son contiguos
+    por construccion -> el argsort es un no-op y la imagen no cambia.
+
+    Para el conectoma con `group_id` = hemisferio_ids(), las regiones AAL
+    estan entrelazadas (L, R, L, R, ...) en el CSV, asi que la permutacion
+    SI tiene efecto: agrupa primero las regiones izquierdas y luego las
+    derechas, mostrando los dos bloques hemisfericos en la diagonal.
+    """
     setup_plot_style()
     N = A.shape[0]
     n_edges = int(A.sum() // 2)
     fig, ax = plt.subplots(figsize=(7, 6))
-    ax.imshow(A, cmap='Greys', aspect='equal', interpolation='nearest', vmin=0, vmax=1)
+
     if group_id is not None:
-        sizes = np.bincount(np.asarray(group_id), minlength=int(group_id.max()) + 1)
+        gid = np.asarray(group_id)
+        # Permutacion estable: ordena por grupo, preservando el orden
+        # original dentro de cada grupo.
+        perm = np.argsort(gid, kind='stable')
+        A_show = A[np.ix_(perm, perm)]
+        gid_sorted = gid[perm]
+        sizes = np.bincount(gid_sorted, minlength=int(gid_sorted.max()) + 1)
+    else:
+        A_show = A
+
+    # vmax adapta: para A binaria queda en 1.0; para W con pesos se ajusta
+    # al maximo de la matriz (no satura los valores grandes).
+    vmax = max(1.0, float(A_show.max()))
+    im = ax.imshow(A_show, cmap='Greys', aspect='equal',
+                   interpolation='nearest', vmin=0, vmax=vmax)
+    if vmax > 1.0:
+        # Para matrices con pesos, colorbar para que el lector vea la escala.
+        fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+
+    if group_id is not None:
+        # Separadores rojos entre bloques (a partir de los tamanos ya
+        # contiguos en A_show).
         for c in np.cumsum(sizes)[:-1]:
             ax.axhline(c - 0.5, color='red', lw=0.8, alpha=0.7)
             ax.axvline(c - 0.5, color='red', lw=0.8, alpha=0.7)
+
     ax.set_title(titulo or fr'Matriz de adyacencia  $N={N}$, $|E|={n_edges}$')
-    ax.set_xlabel('Nodo'); ax.set_ylabel('Nodo')
+    ax.set_xlabel('Nodo (reordenado por grupo)' if group_id is not None else 'Nodo')
+    ax.set_ylabel('Nodo (reordenado por grupo)' if group_id is not None else 'Nodo')
     fig.tight_layout()
     if save_path is not None:
         os.makedirs(os.path.dirname(save_path) or '.', exist_ok=True)

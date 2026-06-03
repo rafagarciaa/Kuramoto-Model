@@ -1,6 +1,6 @@
 {
   "_help": {
-    "sim_type": "0=campo medio | 1=modular (1 nivel) | 2=jerarquico (2 niveles) | 3=conectoma",
+    "sim_type": "0=campo medio | 1=modular (1 nivel) | 2=jerarquico (2 niveles) | 3=conectoma binarizado | 4=conectoma con pesos",
     "general.N": "Numero de osciladores. En sim_type=3 se ignora (lo fija el conectoma).",
     "general.dt": "Paso de integracion de Euler.",
     "general.n_runs": "Numero de condiciones iniciales independientes por celda (sigma,K).",
@@ -12,49 +12,56 @@
     "K_sweep.n_K": "Numero de valores de K del barrido.",
     "K_sweep.K_width_factor": "Anchura de la densidad t-Student que concentra puntos K cerca de Kc.",
     "tipo0_mean_field": "Campo medio: barrido en sigma. K lineal en torno al Kc teorico de cada sigma.",
-    "tipo0_mean_field.scaling": "Finite-size scaling. Si true, corre varias N (fracciones de N) y extrapola Kc a 1/N=0 (limite termodinamico) por ajuste lineal de Kc vs 1/N.",
-    "tipo0_mean_field.scaling_fracs": "Fracciones de N a simular cuando scaling=true. Ej. [0.2,0.4,0.6,0.8,1.0].",
+    "tipo0_mean_field.scaling": "Finite-size scaling: corre varias N y extrapola Kc al limite termodinamico.",
+    "tipo0_mean_field.scaling_fracs": "Fracciones de N a simular cuando scaling=true. Convencion <=1.0.",
+    "tipo0_mean_field.fss_method": "Ley de escalado FSS para extrapolar Kc(N) -> Kc_inf. Opciones: 'linear_invN' (alpha=1, lineal en 1/N, sesgado pero estable), 'powerlaw_2_5' (alpha=2/5, Hong 2007, teorico para Kuramoto Gaussiano), 'powerlaw_free' (alpha ajustado a los datos; la tabla reporta el alpha encontrado y su error relativo respecto a 2/5). El plot SIEMPRE muestra los tres plots 1/N, N^(-2/5) y N^alpha; esta opcion solo decide cual Kc_inf es el 'oficial' que se guarda en el .npz.",
     "tipo1_modular": "Red modular de un nivel. n_modules bloques simetricos, densos por dentro.",
     "tipo2_hierarchical.submodules_per_module": "Array: cada elemento = nº de submodulos (simetricos) dentro de ese modulo de nivel 1.",
     "tipo3_connectome.mat_file": "Nombre del .mat dentro de ./data/.",
     "tipo3_connectome.threshold": "'auto' = el mas alto que mantiene el grafo conexo; o un float.",
     "tipo3_connectome.n_swaps_factor": "Double-edge swaps = n_swaps_factor * numero_de_aristas (matriz aleatoria que preserva grado).",
+    "tipo4_connectome_weighted": "Conectoma SIN binarizar. K solo multiplica los pesos de W. Compara metaestabilidad de W contra red aleatoria con la MISMA strength por nodo (4-cycle swap).",
+    "tipo4_connectome_weighted.approximation": "'matriz_real' = W con diagonal a 0, valores brutos. 'intervalos' = W normalizada y aproximada a n_levels valores equispaciados en [0,1] (ej. n_levels=3 da {0,0.5,1}).",
+    "tipo4_connectome_weighted.n_levels": "Numero de niveles de la rejilla cuando approximation='intervalos'. Solo se usa en ese modo.",
+    "tipo4_connectome_weighted.log_transform": "Si true, aplica log(1+W) antes de normalizar (recomendado para el conectoma: aplana la distribucion muy sesgada). Solo se usa en approximation='intervalos'.",
+    "tipo4_connectome_weighted.n_swaps_factor": "4-cycle swaps = n_swaps_factor * |aristas no nulas|. Cada swap preserva strength exacta de los 4 nodos involucrados.",
     "K_min/K_max/K_center": "Rango y centro del barrido de K. K_max=null en red -> autocalcular por estabilidad. K_center=null -> logspace uniforme."
   },
 
-  "sim_type": 0,
+  "sim_type": 4,
 
   "general": {
-    "N": 1000,
+    "N": 64,
     "dt": 0.025,
     "n_runs": 10,
-    "n_jobs": 16,
+    "n_jobs": 14,
     "seed": null
   },
 
   "convergence": {
-    "block_size": 100,
+    "block_size": 1000,
     "conv_threshold": 1e-3,
-    "t_max": 2000.0
+    "t_max": 1500.0
   },
 
   "K_sweep": {
-    "n_K": 30,
-    "K_width_factor": 0.3
+    "n_K": 40,
+    "K_width_factor": 0.2
   },
 
   "tipo0_mean_field": {
-    "n_sigmas": 3,
-    "sigma_min": 0.5,
+    "n_sigmas": 2,
+    "sigma_min": 1,
     "sigma_max": 1.5,
-    "K_min": 0.25,
-    "K_max": 4.0,
-    "scaling": false,
-    "scaling_fracs": [0.2, 0.4, 0.6, 0.8, 1.0]
+    "K_min": 1.25,
+    "K_max": 4.5,
+    "scaling": true,
+    "fss_method": "powerlaw_2_5",
+    "scaling_fracs": [0.0333, 0.0385, 0.0444, 0.0513, 0.0593, 0.0685, 0.0791, 0.0913, 0.1054, 0.1217, 0.1405, 0.1622, 0.1873, 0.2163, 0.2497, 0.2882, 0.3328, 0.3842, 0.4436, 0.5121, 0.5913, 0.6826, 0.7881, 0.9099, 1.0]
   },
 
   "tipo1_modular": {
-    "n_modules": 3,
+    "n_modules": 4,
     "p_intra": 1.0,
     "n_edges_inter": 1,
     "sigma": 1.0,
@@ -64,9 +71,9 @@
   },
 
   "tipo2_hierarchical": {
-    "submodules_per_module": [3, 3, 3],
+    "submodules_per_module": [3, 2, 4],
     "p_intra_submodule": 1.0,
-    "n_edges_inter_submodule": 2,
+    "n_edges_inter_submodule": 1,
     "n_edges_inter_module": 1,
     "sigma": 1.0,
     "K_min": 5e-3,
@@ -76,10 +83,22 @@
 
   "tipo3_connectome": {
     "mat_file": "SCmatrices88healthy.mat",
-    "threshold": "auto",
+    "threshold": 0.003,
     "n_swaps_factor": 10,
     "sigma": 1.0,
     "K_min": 5e-3,
+    "K_max": null,
+    "K_center": null
+  },
+
+  "tipo4_connectome_weighted": {
+    "mat_file": "SCmatrices88healthy.mat",
+    "approximation": "matriz_real",
+    "n_levels": 5,
+    "log_transform": true,
+    "n_swaps_factor": 50,
+    "sigma": 1.0,
+    "K_min": 0.1,
     "K_max": null,
     "K_center": null
   }

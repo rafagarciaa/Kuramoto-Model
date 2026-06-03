@@ -1,0 +1,97 @@
+Log de ejecucion - 2026-05-30 11:18:07
+============================================================
+
+sim_type = 0  (tipo0_campo_medio)
+Resultados: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo0_campo_medio\N3000_K60_runs30_t1000(1)
+
+Finite-size scaling. N = [600, 1200, 1800, 2400, 3000]
+
+--- N = 600  (1/5) ---
+Barrido: 3 sigmas x 60 K x 30 runs = 5400 simulaciones
+  Niveles: 0  (grupos por nivel: [])
+  Parada: block_size=250, conv_threshold=0.001, max_steps=40000
+  Workers (n_jobs): 16
+
+Lanzando 5400 simulaciones en paralelo...
+[Parallel(n_jobs=16)]: Using backend LokyBackend with 16 concurrent workers.
+[Parallel(n_jobs=16)]: Done   9 tasks      | elapsed:   11.7s
+[Parallel(n_jobs=16)]: Done  18 tasks      | elapsed:   12.2s
+[Parallel(n_jobs=16)]: Done  29 tasks      | elapsed:   12.5s
+[Parallel(n_jobs=16)]: Done  40 tasks      | elapsed:   12.9s
+[Parallel(n_jobs=16)]: Done  53 tasks      | elapsed:   13.2s
+[Parallel(n_jobs=16)]: Done  66 tasks      | elapsed:   13.5s
+[Parallel(n_jobs=16)]: Done  81 tasks      | elapsed:   13.8s
+[Parallel(n_jobs=16)]: Done  96 tasks      | elapsed:   14.0s
+[Parallel(n_jobs=16)]: Done 113 tasks      | elapsed:   14.3s
+[Parallel(n_jobs=16)]: Done 130 tasks      | elapsed:   14.7s
+[Parallel(n_jobs=16)]: Done 149 tasks      | elapsed:   15.2s
+[Parallel(n_jobs=16)]: Done 168 tasks      | elapsed:   15.6s
+[Parallel(n_jobs=16)]: Done 189 tasks      | elapsed:   16.1s
+[Parallel(n_jobs=16)]: Done 210 tasks      | elapsed:   16.6s
+[Parallel(n_jobs=16)]: Done 233 tasks      | elapsed:   17.2s
+[Parallel(n_jobs=16)]: Done 256 tasks      | elapsed:   17.7s
+[Parallel(n_jobs=16)]: Done 281 tasks      | elapsed:   18.3s
+[Parallel(n_jobs=16)]: Done 306 tasks      | elapsed:   19.2s
+[Parallel(n_jobs=16)]: Done 333 tasks      | elapsed:   20.1s
+[Parallel(n_jobs=16)]: Done 360 tasks      | elapsed:   20.9s
+[Parallel(n_jobs=16)]: Done 389 tasks      | elapsed:   21.7s
+[Parallel(n_jobs=16)]: Done 418 tasks      | elapsed:   22.6s
+[Parallel(n_jobs=16)]: Done 449 tasks      | elapsed:   23.5s
+[Parallel(n_jobs=16)]: Done 480 tasks      | elapsed:   24.6s
+[Parallel(n_jobs=16)]: Done 513 tasks      | elapsed:   26.3s
+[Parallel(n_jobs=16)]: Done 546 tasks      | elapsed:   27.4s
+[Parallel(n_jobs=16)]: Done 581 tasks      | elapsed:   28.9s
+[Parallel(n_jobs=16)]: Done 616 tasks      | elapsed:   30.2s
+[Parallel(n_jobs=16)]: Done 653 tasks      | elapsed:   31.5s
+[Parallel(n_jobs=16)]: Done 690 tasks      | elapsed:   32.9s
+[Parallel(n_jobs=16)]: Done 729 tasks      | elapsed:   34.5s
+[Parallel(n_jobs=16)]: Done 768 tasks      | elapsed:   36.1s
+[Parallel(n_jobs=16)]: Done 809 tasks      | elapsed:   37.1s
+[Parallel(n_jobs=16)]: Done 850 tasks      | elapsed:   38.1s
+[Parallel(n_jobs=16)]: Done 893 tasks      | elapsed:   39.2s
+[Parallel(n_jobs=16)]: Done 936 tasks      | elapsed:   40.2s
+[Parallel(n_jobs=16)]: Done 981 tasks      | elapsed:   41.3s
+[Parallel(n_jobs=16)]: Done 1026 tasks      | elapsed:   42.1s
+[Parallel(n_jobs=16)]: Done 1073 tasks      | elapsed:   43.0s
+[Parallel(n_jobs=16)]: Done 1120 tasks      | elapsed:   43.7s
+[Parallel(n_jobs=16)]: Done 1169 tasks      | elapsed:   44.8s
+[Parallel(n_jobs=16)]: Done 1218 tasks      | elapsed:   45.5s
+[Parallel(n_jobs=16)]: Done 1269 tasks      | elapsed:   46.4s
+[Parallel(n_jobs=16)]: Batch computation too fast (0.18836298890242342s.) Setting batch_size=2.
+[Parallel(n_jobs=16)]: Done 1320 tasks      | elapsed:   46.7s
+[Parallel(n_jobs=16)]: Done 1404 tasks      | elapsed:   47.4s
+[Parallel(n_jobs=16)]: Done 1509 tasks      | elapsed:   48.0s
+[Parallel(n_jobs=16)]: Done 1618 tasks      | elapsed:   48.6s
+[Parallel(n_jobs=16)]: Batch computation too fast (0.19668293618565175s.) Setting batch_size=4.
+[Parallel(n_jobs=16)]: Done 1728 tasks      | elapsed:   48.9s
+[Parallel(n_jobs=16)]: Batch computation too fast (0.09858489036560059s.) Setting batch_size=8.
+[Parallel(n_jobs=16)]: Batch computation too slow (2.0977274934222416s.) Setting batch_size=1.
+[Parallel(n_jobs=16)]: Done 1964 tasks      | elapsed:   53.3s
+[Parallel(n_jobs=16)]: Done 2248 tasks      | elapsed:   60.0s
+[Parallel(n_jobs=16)]: Done 2321 tasks      | elapsed:  1.0min
+[Parallel(n_jobs=16)]: Done 2401 tasks      | elapsed:  1.1min
+[Parallel(n_jobs=16)]: Done 2469 tasks      | elapsed:  1.1min
+[Parallel(n_jobs=16)]: Done 2530 tasks      | elapsed:  1.2min
+[Parallel(n_jobs=16)]: Done 2593 tasks      | elapsed:  1.2min
+[Parallel(n_jobs=16)]: Done 2656 tasks      | elapsed:  1.2min
+[Parallel(n_jobs=16)]: Done 2721 tasks      | elapsed:  1.3min
+[Parallel(n_jobs=16)]: Done 2786 tasks      | elapsed:  1.3min
+[Parallel(n_jobs=16)]: Done 2853 tasks      | elapsed:  1.3min
+[Parallel(n_jobs=16)]: Done 2920 tasks      | elapsed:  1.4min
+[Parallel(n_jobs=16)]: Done 2989 tasks      | elapsed:  1.4min
+[Parallel(n_jobs=16)]: Done 3058 tasks      | elapsed:  1.4min
+[Parallel(n_jobs=16)]: Done 3129 tasks      | elapsed:  1.4min
+[Parallel(n_jobs=16)]: Done 3200 tasks      | elapsed:  1.4min
+[Parallel(n_jobs=16)]: Done 3273 tasks      | elapsed:  1.4min
+[Parallel(n_jobs=16)]: Batch computation too fast (0.18995340616067247s.) Setting batch_size=2.
+[Parallel(n_jobs=16)]: Done 3346 tasks      | elapsed:  1.4min
+[Parallel(n_jobs=16)]: Batch computation too fast (0.12362837791442871s.) Setting batch_size=4.
+[Parallel(n_jobs=16)]: Done 3540 tasks      | elapsed:  1.5min
+[Parallel(n_jobs=16)]: Batch computation too slow (2.0102999666849173s.) Setting batch_size=1.
+[Parallel(n_jobs=16)]: Done 3795 tasks      | elapsed:  1.5min
+[Parallel(n_jobs=16)]: Done 3884 tasks      | elapsed:  1.6min
+[Parallel(n_jobs=16)]: Done 3970 tasks      | elapsed:  1.6min
+[Parallel(n_jobs=16)]: Done 4049 tasks      | elapsed:  1.6min
+[Parallel(n_jobs=16)]: Done 4128 tasks      | elapsed:  1.7min
+[Parallel(n_jobs=16)]: Done 4209 tasks      | elapsed:  1.7min
+[Parallel(n_jobs=16)]: Done 4290 tasks      | elapsed:  1.8min
