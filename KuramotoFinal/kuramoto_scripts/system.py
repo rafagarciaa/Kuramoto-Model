@@ -25,7 +25,8 @@ Tras run():
 """
 
 import numpy as np
-from kuramoto_scripts.integrators import _euler_meanfield, _euler_network
+from kuramoto_scripts.integrators import (_euler_meanfield, _euler_network,
+                                           _euler_network_long)
 
 
 class KuramotoSystem:
@@ -131,6 +132,46 @@ class KuramotoSystem:
                 self.R, self.psi, self.r_levels, rhs,
             )
         self._calcular_observables()
+
+    def run_temporal(self, K, n_steps, sample_every=25):
+        """Corre `n_steps` pasos SIN parada por convergencia y guarda
+        un historico de theta cada `sample_every` pasos.
+
+        Util para sim_type 5 (dinamica cerebral): permite hacer snapshots
+        de fase y animaciones a posteriori, no solo estadisticas R, sigma_R.
+
+        Solo aplicable al modo red (A != None). En campo medio no tiene
+        sentido porque las fases individuales no aportan informacion mas
+        alla de R y psi globales.
+
+        Tras la llamada, los atributos R, psi, r_levels contienen toda
+        la serie temporal de los n_steps. n_steps_used = n_steps. Se
+        rellena self.theta_history (n_samples, N).
+
+        Devuelve n_samples = numero de filas validas en theta_history.
+        """
+        if self.A is None:
+            raise ValueError("run_temporal solo definido para modo red (A != None).")
+        if n_steps > self.max_steps:
+            raise ValueError(f"n_steps={n_steps} excede max_steps={self.max_steps}.")
+        n_samples = (n_steps + sample_every - 1) // sample_every
+        self.theta_history = np.zeros((n_samples, self.N), dtype=np.float64)
+
+        rhs = np.zeros(self.N, dtype=np.float64)
+        saved = _euler_network_long(
+            self.theta, self.theta_new, self.omega, self.A, K, self.dt,
+            n_steps,
+            self.level_id, self.n_groups_per_level, self.group_size,
+            self.R, self.psi, self.r_levels, rhs,
+            self.theta_history, sample_every,
+        )
+        self.n_steps_used = n_steps
+        # Tiempos correspondientes a cada snapshot.
+        self.t_history = np.arange(saved) * sample_every * self.dt
+        # Recortamos por si saved < n_samples (no deberia, pero por seguridad).
+        self.theta_history = self.theta_history[:saved]
+        self._calcular_observables()
+        return saved
 
     def _ventana_final(self):
         """Indices [lo, hi) de los DOS ultimos bloques (2*block_size valores)."""

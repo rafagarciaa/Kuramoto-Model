@@ -1,6 +1,6 @@
 {
   "_help": {
-    "sim_type": "0=campo medio | 1=modular (1 nivel) | 2=jerarquico (2 niveles) | 3=conectoma binarizado | 4=conectoma con pesos",
+    "sim_type": "0=campo medio | 1=modular (1 nivel) | 2=jerarquico (2 niveles) | 3=conectoma binarizado | 4=conectoma con pesos | 5=dinamica cerebral (barrido + temporal en K_meta + animacion fase)",
     "general.N": "Numero de osciladores. En sim_type=3 se ignora (lo fija el conectoma).",
     "general.dt": "Paso de integracion de Euler.",
     "general.n_runs": "Numero de condiciones iniciales independientes por celda (sigma,K).",
@@ -25,16 +25,25 @@
     "tipo4_connectome_weighted.n_levels": "Numero de niveles de la rejilla cuando approximation='intervalos'. Solo se usa en ese modo.",
     "tipo4_connectome_weighted.log_transform": "Si true, aplica log(1+W) antes de normalizar (recomendado para el conectoma: aplana la distribucion muy sesgada). Solo se usa en approximation='intervalos'.",
     "tipo4_connectome_weighted.n_swaps_factor": "4-cycle swaps = n_swaps_factor * |aristas no nulas|. Cada swap preserva strength exacta de los 4 nodos involucrados.",
+    "tipo5_brain_dynamics": "Dinamica cerebral: (1) barrido en K como tipo4, (2) identifica K_meta=argmax(sigma_R) del conectoma, (3) corre UNA simulacion temporal larga a K_meta guardando theta_history, (4) genera R(t), snapshots polares y MP4/GIF animado.",
+    "tipo5_brain_dynamics.omega_mode": "'uniform' (igual que tipos 3-4: omega ~ N(0,sigma) global) | 'per_hemisphere' (cada hemisferio tiene su omega_mean: usa omega_means[2]) | 'per_lobe' (6 lobulos AAL: frontal, insular_limbico, occipital, parietal, subcortical, temporal; usa omega_means[6] o LOBE_DEFAULT_OMEGAS si null).",
+    "tipo5_brain_dynamics.omega_means": "Array con tantas frecuencias como grupos. Para 'per_hemisphere' = [omega_L, omega_R]. Para 'per_lobe' = [frontal, insular_limbico, occipital, parietal, subcortical, temporal]. null en 'per_lobe' usa los defaults sensatos del modulo.",
+    "tipo5_brain_dynamics.omega_intra_sigma": "Dispersion dentro de cada grupo (Gaussiana). Recomendado ~0.05-0.1 para que cada grupo sea estrecho.",
+    "tipo5_brain_dynamics.temporal_t_max": "Duracion (en u.t.) de la simulacion temporal a K_meta. Recomendado largo (~500-2000) para resolver oscilaciones metaestables.",
+    "tipo5_brain_dynamics.sample_every": "Pasos entre snapshots de theta (cada N pasos se guarda). Memoria total: (temporal_t_max/dt/sample_every) * N * 8 bytes.",
+    "tipo5_brain_dynamics.viz_groups": "'hemispheres' (2 grupos) | 'lobes' (6 grupos). Define el coloreado de snapshots y animacion.",
+    "tipo5_brain_dynamics.animate_fps": "Frames por segundo del MP4/GIF.",
+    "tipo5_brain_dynamics.animate_max_frames": "Tope de frames del video (submuestreo si hay mas snapshots).",
     "K_min/K_max/K_center": "Rango y centro del barrido de K. K_max=null en red -> autocalcular por estabilidad. K_center=null -> logspace uniforme."
   },
 
-  "sim_type": 4,
+  "sim_type": 5,
 
   "general": {
     "N": 64,
     "dt": 0.025,
     "n_runs": 10,
-    "n_jobs": 14,
+    "n_jobs": 16,
     "seed": null
   },
 
@@ -45,7 +54,7 @@
   },
 
   "K_sweep": {
-    "n_K": 40,
+    "n_K": 50,
     "K_width_factor": 0.2
   },
 
@@ -101,5 +110,25 @@
     "K_min": 0.1,
     "K_max": null,
     "K_center": null
+  },
+
+  "tipo5_brain_dynamics": {
+    "mat_file": "SCmatrices88healthy.mat",
+    "approximation": "intervalos",
+    "n_levels": 5,
+    "log_transform": true,
+    "n_swaps_factor": 40,
+    "sigma": 1.0,
+    "K_min": 0.05,
+    "K_max": null,
+    "K_center": null,
+    "omega_mode": "per_lobe",
+    "omega_means": null,
+    "omega_intra_sigma": 0.08,
+    "temporal_t_max": 600.0,
+    "sample_every": 4,
+    "viz_groups": "lobes",
+    "animate_fps": 30,
+    "animate_max_frames": 100000
   }
 }

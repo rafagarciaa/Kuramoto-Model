@@ -32,10 +32,11 @@ class Params:
     """Contenedor de todos los parametros de la corrida.
 
     Atributos principales:
-        sim_type   : int (0..4)
+        sim_type   : int (0..5)
         general, convergence, K_sweep : Section
         tipo0_mean_field, tipo1_modular, tipo2_hierarchical,
-        tipo3_connectome, tipo4_connectome_weighted : Section
+        tipo3_connectome, tipo4_connectome_weighted,
+        tipo5_brain_dynamics : Section
         max_steps  : int derivado (t_max / dt)
     """
     def __init__(self, data):
@@ -50,6 +51,7 @@ class Params:
         self.tipo2_hierarchical        = Section(data["tipo2_hierarchical"])
         self.tipo3_connectome          = Section(data["tipo3_connectome"])
         self.tipo4_connectome_weighted = Section(data["tipo4_connectome_weighted"])
+        self.tipo5_brain_dynamics      = Section(data["tipo5_brain_dynamics"])
 
         # Cantidad derivada: tope de pasos de la integracion.
         self.max_steps = int(round(self.convergence.t_max / self.general.dt))
@@ -62,6 +64,7 @@ class Params:
             2: self.tipo2_hierarchical,
             3: self.tipo3_connectome,
             4: self.tipo4_connectome_weighted,
+            5: self.tipo5_brain_dynamics,
         }[self.sim_type]
 
     def as_dict_plano(self):
@@ -80,6 +83,7 @@ class Params:
             2: "tipo2_hierarchical",
             3: "tipo3_connectome",
             4: "tipo4_connectome_weighted",
+            5: "tipo5_brain_dynamics",
         }[self.sim_type]
 
 

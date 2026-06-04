@@ -1,0 +1,31 @@
+Parametros de la ejecucion
+========================================
+sim_type                  = 5
+max_steps                 = 60000
+general.N                 = 64
+general.dt                = 0.025
+general.n_runs            = 10
+general.n_jobs            = 16
+general.seed              = None
+convergence.block_size    = 1000
+convergence.conv_threshold = 0.001
+convergence.t_max         = 1500.0
+K_sweep.n_K               = 50
+K_sweep.K_width_factor    = 0.2
+tipo5_brain_dynamics.mat_file = SCmatrices88healthy.mat
+tipo5_brain_dynamics.approximation = matriz_real
+tipo5_brain_dynamics.n_levels = 5
+tipo5_brain_dynamics.log_transform = True
+tipo5_brain_dynamics.n_swaps_factor = 40
+tipo5_brain_dynamics.sigma = 1.0
+tipo5_brain_dynamics.K_min = 0.05
+tipo5_brain_dynamics.K_max = None
+tipo5_brain_dynamics.K_center = None
+tipo5_brain_dynamics.omega_mode = per_lobe
+tipo5_brain_dynamics.omega_means = None
+tipo5_brain_dynamics.omega_intra_sigma = 0.08
+tipo5_brain_dynamics.temporal_t_max = 600.0
+tipo5_brain_dynamics.sample_every = 2
+tipo5_brain_dynamics.viz_groups = lobes
+tipo5_brain_dynamics.animate_fps = 60
+tipo5_brain_dynamics.animate_max_frames = 100000

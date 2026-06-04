@@ -1,0 +1,83 @@
+Log de ejecucion - 2026-06-04 10:17:59
+============================================================
+
+sim_type = 5  (tipo5_dinamica_cerebral)
+Resultados: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo5_dinamica_cerebral\N64_K50_runs10_t1500
+
+Conectoma preparado: matriz real
+  shape=(90, 90), max(W)=0.4496, max(strength)=1.32
+omega_mode: per_lobe; grupos=['frontal', 'insular_limbico', 'occipital', 'parietal', 'subcortical', 'temporal']; omega_means=[1.5, 0.7, 1.0, 1.0, 0.9, 0.8]
+
+--- (2/4) Barrido CONECTOMA ---
+Barrido: 1 sigmas x 50 K x 10 runs = 500 simulaciones
+  Niveles: 1  (grupos por nivel: [6])
+  Parada: block_size=1000, conv_threshold=0.001, max_steps=60000
+  Workers (n_jobs): 16
+
+Lanzando 500 simulaciones en paralelo...
+[Parallel(n_jobs=16)]: Using backend LokyBackend with 16 concurrent workers.
+[Parallel(n_jobs=16)]: Done   9 tasks      | elapsed:    6.0s
+[Parallel(n_jobs=16)]: Done  18 tasks      | elapsed:    9.1s
+[Parallel(n_jobs=16)]: Done  29 tasks      | elapsed:   11.5s
+[Parallel(n_jobs=16)]: Done  40 tasks      | elapsed:   14.4s
+[Parallel(n_jobs=16)]: Done  53 tasks      | elapsed:   16.2s
+[Parallel(n_jobs=16)]: Done  66 tasks      | elapsed:   20.4s
+[Parallel(n_jobs=16)]: Done  81 tasks      | elapsed:   24.3s
+[Parallel(n_jobs=16)]: Done  96 tasks      | elapsed:   28.6s
+[Parallel(n_jobs=16)]: Done 113 tasks      | elapsed:   32.9s
+[Parallel(n_jobs=16)]: Done 130 tasks      | elapsed:   37.5s
+[Parallel(n_jobs=16)]: Done 149 tasks      | elapsed:   43.3s
+[Parallel(n_jobs=16)]: Done 168 tasks      | elapsed:   50.0s
+[Parallel(n_jobs=16)]: Done 189 tasks      | elapsed:   55.3s
+[Parallel(n_jobs=16)]: Done 210 tasks      | elapsed:  1.0min
+[Parallel(n_jobs=16)]: Done 233 tasks      | elapsed:  1.1min
+[Parallel(n_jobs=16)]: Done 256 tasks      | elapsed:  1.2min
+[Parallel(n_jobs=16)]: Done 281 tasks      | elapsed:  1.3min
+[Parallel(n_jobs=16)]: Done 306 tasks      | elapsed:  1.4min
+[Parallel(n_jobs=16)]: Done 333 tasks      | elapsed:  1.4min
+[Parallel(n_jobs=16)]: Done 360 tasks      | elapsed:  1.4min
+[Parallel(n_jobs=16)]: Done 389 tasks      | elapsed:  1.5min
+[Parallel(n_jobs=16)]: Done 418 tasks      | elapsed:  1.5min
+[Parallel(n_jobs=16)]: Done 449 tasks      | elapsed:  1.5min
+[Parallel(n_jobs=16)]: Done 500 out of 500 | elapsed:  1.5min finished
+Tiempo del barrido: 1.5 min
+
+
+--- (2/4) Barrido ALEATORIA (misma strength) ---
+Barrido: 1 sigmas x 50 K x 10 runs = 500 simulaciones
+  Niveles: 1  (grupos por nivel: [6])
+  Parada: block_size=1000, conv_threshold=0.001, max_steps=60000
+  Workers (n_jobs): 16
+
+Lanzando 500 simulaciones en paralelo...
+[Parallel(n_jobs=16)]: Using backend LokyBackend with 16 concurrent workers.
+[Parallel(n_jobs=16)]: Done   9 tasks      | elapsed:    3.5s
+[Parallel(n_jobs=16)]: Done  18 tasks      | elapsed:    5.1s
+[Parallel(n_jobs=16)]: Done  29 tasks      | elapsed:    7.3s
+[Parallel(n_jobs=16)]: Done  40 tasks      | elapsed:   10.9s
+[Parallel(n_jobs=16)]: Done  53 tasks      | elapsed:   13.5s
+[Parallel(n_jobs=16)]: Done  66 tasks      | elapsed:   16.4s
+[Parallel(n_jobs=16)]: Done  81 tasks      | elapsed:   21.1s
+[Parallel(n_jobs=16)]: Done  96 tasks      | elapsed:   24.7s
+[Parallel(n_jobs=16)]: Done 113 tasks      | elapsed:   29.2s
+[Parallel(n_jobs=16)]: Done 130 tasks      | elapsed:   33.0s
+[Parallel(n_jobs=16)]: Done 149 tasks      | elapsed:   39.3s
+[Parallel(n_jobs=16)]: Done 168 tasks      | elapsed:   45.0s
+[Parallel(n_jobs=16)]: Done 189 tasks      | elapsed:   49.3s
+[Parallel(n_jobs=16)]: Done 210 tasks      | elapsed:   53.0s
+[Parallel(n_jobs=16)]: Done 233 tasks      | elapsed:   56.8s
+[Parallel(n_jobs=16)]: Done 256 tasks      | elapsed:   57.8s
+[Parallel(n_jobs=16)]: Done 281 tasks      | elapsed:   58.2s
+[Parallel(n_jobs=16)]: Done 306 tasks      | elapsed:   58.6s
+[Parallel(n_jobs=16)]: Done 333 tasks      | elapsed:   59.0s
+[Parallel(n_jobs=16)]: Done 360 tasks      | elapsed:   59.4s
+[Parallel(n_jobs=16)]: Done 389 tasks      | elapsed:   59.7s
+[Parallel(n_jobs=16)]: Done 418 tasks      | elapsed:  1.0min
+[Parallel(n_jobs=16)]: Done 449 tasks      | elapsed:  1.0min
+[Parallel(n_jobs=16)]: Done 500 out of 500 | elapsed:  1.0min finished
+Tiempo del barrido: 1.0 min
+
+
+--- (3/4) K_meta detectado: K=2.807, sigma_R=0.2613 ---
+--- (4/4) Simulacion temporal a K_meta: 24000 pasos = 600 u.t., snapshots cada 2 pasos ---
+  guardados 12000 snapshots de theta

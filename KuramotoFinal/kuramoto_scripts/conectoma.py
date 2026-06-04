@@ -22,6 +22,7 @@ Funciones:
 """
 
 import os
+import re
 import csv
 import numpy as np
 import scipy.io as sio
@@ -170,6 +171,99 @@ def hemisferio_ids(ruta_csv):
             nombre = fila[1].strip()
             hemis.append(0 if nombre.upper().startswith('L') else 1)
     return np.asarray(hemis, dtype=np.int64)
+
+
+# ----------------------------------------------------------------------------
+# Lobulos (clasificacion de regiones AAL por lobulo cerebral, sim_type 5)
+# ----------------------------------------------------------------------------
+
+# Orden y nombre de los lobulos. Los indices en el array que devuelve
+# `lobulo_ids` se corresponden con las posiciones de esta lista.
+LOBE_NAMES = [
+    'frontal',         # 0  cortex frontal (incluye motor primario)
+    'insular_limbico', # 1  insula, cingulum, hipocampo, amigdala
+    'occipital',       # 2  cortex visual + fusiform
+    'parietal',        # 3  cortex parietal + somatosensorial + precuneus
+    'subcortical',     # 4  ganglios basales y talamo
+    'temporal',        # 5  cortex temporal y Heschl (auditivo)
+]
+
+# Frecuencias intrinsecas tipicas asociadas a los lobulos (en "unidades de
+# modelo", no Hz). Capturan QUALITATIVAMENTE las relaciones del cerebro
+# real: frontal/sensoriomotor beat mas rapido (beta-like), occipital/parietal
+# en torno a alpha, temporal/limbico mas lento (theta-like). Valores
+# pensados para sigma_intra ~ 0.1: cada lobulo es una distribucion
+# estrecha en torno a su mean.
+LOBE_DEFAULT_OMEGAS = {
+    'frontal':         1.50,
+    'insular_limbico': 0.70,
+    'occipital':       1.00,
+    'parietal':        1.00,
+    'subcortical':     0.90,
+    'temporal':        0.80,
+}
+
+# Reglas de clasificacion: (lista de keywords en mayuscula) -> indice de lobulo.
+# Se aplica la PRIMERA regla que matchee, asi que el orden importa.
+_LOBE_RULES = [
+    # subcortical primero (es el mas especifico)
+    (['CAUDATE', 'PUTAMEN', 'PALLIDUM', 'THALAMUS'],                4),
+    # insular/limbico
+    (['INSULA', 'CINGULUM', 'HIPPOCAMPUS', 'PARAHIPPOCAMPAL',
+      'AMYGDALA'],                                                  1),
+    # occipital
+    (['CALCARINE', 'CUNEUS', 'LINGUAL', 'OCCIPITAL', 'FUSIFORM'],  2),
+    # parietal (incluye somatosensorial postcentral)
+    (['POSTCENTRAL', 'PARIETAL', 'SUPRAMARGINAL', 'ANGULAR',
+      'PRECUNEUS', 'PARACENTRAL'],                                  3),
+    # temporal (incluye Heschl/Heschls = cortex auditivo)
+    (['HESCHL', 'HESCHLS', 'TEMPORAL'],                             5),
+    # frontal (catch-all para el resto: precentral, frontal, orbital,
+    # IFG, rolandic operculum, olfactory, rectal, medial gyrus)
+    (['PRECENTRAL', 'FRONTAL', 'ORBITAL', 'IFG', 'ROLANDIC',
+      'OLFACTORY', 'RECTAL', 'MEDIAL GYRUS'],                       0),
+]
+
+
+def lobulo_ids(ruta_csv):
+    """Clasifica cada region AAL en uno de 6 lobulos cerebrales.
+
+    Lobulos (indices 0..5):
+        0 = frontal           (precentral, frontal, IFG, orbital, ...)
+        1 = insular_limbico   (insula, cingulum, hippocampus, ...)
+        2 = occipital         (calcarine, cuneus, lingual, fusiform, ...)
+        3 = parietal          (postcentral, parietal, precuneus, ...)
+        4 = subcortical       (caudate, putamen, pallidum, thalamus)
+        5 = temporal          (Heschl, temporal)
+
+    Cualquier region que no encaje en ninguna regla acaba en 'frontal'
+    como catch-all defensivo.
+
+    Devuelve
+    --------
+    lob_ids : (N,) int64
+    """
+    ids = []
+    with open(ruta_csv, 'r', encoding='utf-8') as f:
+        lector = csv.reader(f, delimiter=';')
+        next(lector, None)
+        for fila in lector:
+            if len(fila) < 2:
+                continue
+            nombre = fila[1].strip().upper()
+            # Quitamos el prefijo 'L ' o 'R ' (hemisferio).
+            if nombre.startswith('L ') or nombre.startswith('R '):
+                nombre = nombre[2:].strip()
+            asignado = 0  # default: frontal
+            for keywords, lob_idx in _LOBE_RULES:
+                # Matching de palabra COMPLETA (\b regex) para evitar
+                # falsos positivos tipo "ANGULAR" en "TRIANGULARIS".
+                if any(re.search(r'\b' + re.escape(kw) + r'\b', nombre)
+                       for kw in keywords):
+                    asignado = lob_idx
+                    break
+            ids.append(asignado)
+    return np.asarray(ids, dtype=np.int64)
 
 
 # ----------------------------------------------------------------------------

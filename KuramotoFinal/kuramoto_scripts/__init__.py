@@ -25,7 +25,7 @@ from kuramoto_scripts.system       import KuramotoSystem, run_simulation
 from kuramoto_scripts.observables  import Kc_teorica, Kc_experimental
 from kuramoto_scripts.grids        import K_values_tstudent, K_values_log_tstudent
 from kuramoto_scripts.networks     import (
-    generar_ICs, generar_ICs_por_sigma,
+    generar_ICs, generar_ICs_por_sigma, generar_ICs_por_grupos,
     crear_matriz_modular, generar_As_modular,
     crear_matriz_jerarquica, generar_As_jerarquica,
     stats_matriz_adyacencia,
@@ -35,6 +35,7 @@ from kuramoto_scripts.conectoma    import (
     binarizar, es_conexo, buscar_threshold_optimo,
     cargar_y_preparar_A, hemisferio_ids, randomize_preserving_degree,
     prepare_W_real, prepare_W_intervalos, randomize_preserving_strength,
+    lobulo_ids, LOBE_NAMES, LOBE_DEFAULT_OMEGAS,
 )
 from kuramoto_scripts.sweep        import barrido
 from kuramoto_scripts.io           import (
@@ -45,4 +46,5 @@ from kuramoto_scripts.plotting     import (
     setup_plot_style,
     plot_mean_field, plot_modular, plot_hierarchical, plot_connectome,
     plot_scaling_Kc, plot_matriz_adyacencia,
+    plot_R_temporal, plot_phase_snapshots, animate_phase_evolution,
 )

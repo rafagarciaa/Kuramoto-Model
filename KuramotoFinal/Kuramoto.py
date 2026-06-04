@@ -27,15 +27,18 @@ from kuramoto_scripts import (
     load_params,
     barrido, Kc_teorica, Kc_experimental,
     K_values_tstudent, K_values_log_tstudent,
-    generar_ICs, generar_ICs_por_sigma,
+    generar_ICs, generar_ICs_por_sigma, generar_ICs_por_grupos,
     generar_As_modular, generar_As_jerarquica,
     cargar_y_preparar_A, hemisferio_ids, randomize_preserving_degree,
     prepare_W_real, prepare_W_intervalos, randomize_preserving_strength,
+    lobulo_ids, LOBE_NAMES, LOBE_DEFAULT_OMEGAS,
     crear_carpeta_resultados, guardar_params_txt,
     iniciar_log, cerrar_log, _ruta,
     plot_mean_field, plot_modular, plot_hierarchical, plot_connectome,
     plot_scaling_Kc, plot_matriz_adyacencia,
+    plot_R_temporal, plot_phase_snapshots, animate_phase_evolution,
 )
+from kuramoto_scripts.system import KuramotoSystem
 
 # Exponente teorico FSS para Kuramoto campo medio con g(omega) Gaussiana
 # (Hong, Chate, Park PRL 2007). El metodo "linear_invN" asume alpha=1
@@ -436,14 +439,209 @@ def run_tipo4(p, run_dir):
 
 
 # ============================================================================
+# Tipo 5: dinamica cerebral
+# ============================================================================
+#
+# Flujo en 4 fases:
+#   1. Preparar W (con la misma logica que tipo4) + ICs con omegas por grupo.
+#   2. Barrer K (conectoma vs. aleatoria) para estimar K_meta = argmax(sigma_R).
+#   3. Lanzar UNA simulacion temporal larga a K_meta con historico de theta.
+#   4. Generar plots: R(t), snapshots polares y MP4/GIF.
+# ----------------------------------------------------------------------------
+
+def _resolve_grupos_y_omegas(s5, N, hemi, lob):
+    """Decide group_id y omega_means a partir de s5.omega_mode.
+
+    Devuelve (group_id, group_names, omega_means).
+    """
+    mode = getattr(s5, 'omega_mode', 'uniform')
+    if mode == 'uniform':
+        # group_id trivial (un solo grupo); omega_means = [0.0] -> sigma uniforme.
+        return (np.zeros(N, dtype=np.int64), ['todo'],
+                np.array([0.0]))
+
+    if mode == 'per_hemisphere':
+        means = getattr(s5, 'omega_means', None)
+        if means is None or len(means) != 2:
+            raise ValueError("omega_mode='per_hemisphere' requiere "
+                             "omega_means con 2 valores [omega_L, omega_R].")
+        return (hemi.astype(np.int64), ['izquierdo', 'derecho'],
+                np.asarray(means, dtype=np.float64))
+
+    if mode == 'per_lobe':
+        means = getattr(s5, 'omega_means', None)
+        if means is None:
+            # Defaults sensatos del modulo conectoma.
+            means = [LOBE_DEFAULT_OMEGAS[n] for n in LOBE_NAMES]
+        if len(means) != len(LOBE_NAMES):
+            raise ValueError(f"omega_mode='per_lobe' requiere "
+                             f"omega_means con {len(LOBE_NAMES)} valores "
+                             f"(uno por lobulo).")
+        return (lob.astype(np.int64), list(LOBE_NAMES),
+                np.asarray(means, dtype=np.float64))
+
+    raise ValueError(f"omega_mode='{mode}' desconocido.")
+
+
+def run_tipo5(p, run_dir):
+    g, c, ks, s5 = p.general, p.convergence, p.K_sweep, p.tipo5_brain_dynamics
+    ruta_mat = os.path.join(DATA, s5.mat_file)
+
+    # --- (1) Preparar W como en tipo4 ---
+    approx = getattr(s5, 'approximation', 'matriz_real')
+    if approx == 'intervalos':
+        n_levels      = getattr(s5, 'n_levels', 5)
+        log_transform = bool(getattr(s5, 'log_transform', True))
+        W = prepare_W_intervalos(ruta_mat, n_levels, log_transform=log_transform)
+        desc = f"intervalos (n_levels={n_levels}, log={log_transform})"
+    elif approx == 'matriz_real':
+        W = prepare_W_real(ruta_mat)
+        desc = "matriz real"
+    else:
+        raise ValueError(f"approximation='{approx}' desconocido.")
+
+    N = W.shape[0]
+    strength_max = float(W.sum(axis=1).max())
+    print(f"Conectoma preparado: {desc}")
+    print(f"  shape={W.shape}, max(W)={W.max():.4g}, "
+          f"max(strength)={strength_max:.4g}")
+
+    hemi = hemisferio_ids(os.path.join(DATA, 'AAL_regions.csv'))
+    lob  = lobulo_ids(os.path.join(DATA, 'AAL_regions.csv'))
+
+    # group_id para frecuencias intrinsecas (Fase B/C).
+    group_id, group_names, omega_means = _resolve_grupos_y_omegas(s5, N, hemi, lob)
+    print(f"omega_mode: {getattr(s5, 'omega_mode', 'uniform')}; "
+          f"grupos={group_names}; omega_means={omega_means.tolist()}")
+
+    # level_ids para los observables r_g(t).
+    viz_groups = getattr(s5, 'viz_groups', 'hemispheres')
+    if viz_groups == 'lobes':
+        viz_group_id, viz_group_names = lob, list(LOBE_NAMES)
+    else:
+        viz_group_id, viz_group_names = hemi, ['izquierdo', 'derecho']
+    level_ids = [viz_group_id]
+
+    # --- (2) Barrido en K: conectoma vs aleatoria ---
+    K_max = s5.K_max if s5.K_max is not None else _K_max_estable(W, g.dt)
+    K_grid = K_values_log_tstudent(ks.n_K, s5.K_min, K_max,
+                                   s5.K_center, ks.K_width_factor)[None, :]
+    sigmas = np.array([s5.sigma])
+
+    # ICs con frecuencias por grupo (per_hemisphere/per_lobe) o uniformes.
+    omega_intra_sigma = float(getattr(s5, 'omega_intra_sigma', 0.08))
+    if getattr(s5, 'omega_mode', 'uniform') == 'uniform':
+        omegas_IC, thetas_IC = generar_ICs(g.n_runs, N, s5.sigma, seed=g.seed)
+    else:
+        omegas_IC, thetas_IC = generar_ICs_por_grupos(
+            g.n_runs, N, group_id, omega_means, omega_intra_sigma, seed=g.seed)
+    omegas_IC, thetas_IC = omegas_IC[None, ...], thetas_IC[None, ...]
+
+    # Matrices por run.
+    rng = np.random.default_rng(g.seed)
+    W_runs_conn = [W for _ in range(g.n_runs)]
+    n_swaps_factor = getattr(s5, 'n_swaps_factor', 20)
+    W_runs_rand = [randomize_preserving_strength(W, n_swaps_factor, rng)
+                   for _ in range(g.n_runs)]
+
+    plot_matriz_adyacencia(W, viz_group_id, _ruta(run_dir, 'W_conectoma.png'),
+                           titulo=fr'Conectoma {approx}  $N={N}$')
+    plot_matriz_adyacencia(W_runs_rand[0], viz_group_id,
+                           _ruta(run_dir, 'W_aleatoria.png'),
+                           titulo=fr'Aleatoria misma strength  $N={N}$')
+
+    print("\n--- (2/4) Barrido CONECTOMA ---")
+    out_conn = barrido(N, g.dt, p.max_steps, c.block_size, c.conv_threshold,
+                       K_grid, sigmas, g.n_runs, omegas_IC, thetas_IC,
+                       A_runs=W_runs_conn, level_ids=level_ids, n_jobs=g.n_jobs)
+    print("\n--- (2/4) Barrido ALEATORIA (misma strength) ---")
+    out_rand = barrido(N, g.dt, p.max_steps, c.block_size, c.conv_threshold,
+                       K_grid, sigmas, g.n_runs, omegas_IC, thetas_IC,
+                       A_runs=W_runs_rand, level_ids=level_ids, n_jobs=g.n_jobs)
+    plot_connectome(K_grid, out_conn, out_rand, N, g.n_runs, run_dir,
+                    hemi_labels=tuple(viz_group_names))
+
+    # --- (3) K_meta = K donde sigma_R del conectoma es maximo ---
+    R_sigma_conn = out_conn['R_sigma'][0]
+    idx_meta = int(np.argmax(R_sigma_conn))
+    K_meta = float(K_grid[0, idx_meta])
+    print(f"\n--- (3/4) K_meta detectado: K={K_meta:.4g}, "
+          f"sigma_R={R_sigma_conn[idx_meta]:.4f} ---")
+
+    # --- (4) Simulacion temporal larga a K_meta ---
+    t_max_temporal = float(getattr(s5, 'temporal_t_max', 800.0))
+    sample_every   = int(getattr(s5, 'sample_every', 25))
+    n_steps_temp   = int(round(t_max_temporal / g.dt))
+    if n_steps_temp > p.max_steps:
+        # Necesitamos un sistema con max_steps suficiente.
+        max_steps_temp = n_steps_temp
+    else:
+        max_steps_temp = p.max_steps
+
+    sys_t = KuramotoSystem(N, g.dt, max_steps_temp,
+                            c.block_size, c.conv_threshold)
+    # Usamos la misma IC del primer run para que sea reproducible.
+    sys_t.initialize(sigma=s5.sigma,
+                     omega=omegas_IC[0, 0],
+                     theta_0=thetas_IC[0, 0],
+                     A=W,
+                     level_ids=[viz_group_id])
+    print(f"--- (4/4) Simulacion temporal a K_meta: "
+          f"{n_steps_temp} pasos = {t_max_temporal:.0f} u.t., "
+          f"snapshots cada {sample_every} pasos ---")
+    n_samples = sys_t.run_temporal(K_meta, n_steps_temp, sample_every)
+    print(f"  guardados {n_samples} snapshots de theta")
+
+    # Recortar R, r_levels al rango efectivamente integrado.
+    t_full = np.arange(n_steps_temp) * g.dt
+    R_t    = sys_t.R[:n_steps_temp]
+    n_viz_groups = int(viz_group_id.max()) + 1
+    r_levels_t = sys_t.r_levels[0, :n_viz_groups, :n_steps_temp]
+
+    # Plots y animacion.
+    plot_R_temporal(t_full, R_t, r_levels=r_levels_t, K_meta=K_meta,
+                    save_path=_ruta(run_dir, 'R_vs_t.png'),
+                    group_names=viz_group_names)
+    plot_phase_snapshots(sys_t.theta_history, sys_t.t_history,
+                         viz_group_id,
+                         save_path=_ruta(run_dir, 'phase_snapshots.png'),
+                         n_panels=6, group_names=viz_group_names,
+                         K_meta=K_meta)
+    anim_path = animate_phase_evolution(
+        sys_t.theta_history, sys_t.t_history, viz_group_id,
+        save_path=_ruta(run_dir, 'phase_evolution.mp4'),
+        group_names=viz_group_names, K_meta=K_meta,
+        fps=int(getattr(s5, 'animate_fps', 15)),
+        max_frames=int(getattr(s5, 'animate_max_frames', 250)))
+    print(f"  animacion: {anim_path}")
+
+    # Guardar todo el barrido + serie temporal.
+    _guardar(run_dir, K_grid, out_conn,
+             extra={'approximation': approx, 'K_max': K_max,
+                    'K_meta': K_meta, 'idx_K_meta': idx_meta,
+                    'rand_R_mean':  out_rand['R_mean'],
+                    'rand_R_sigma': out_rand['R_sigma'],
+                    'rand_R_err':   out_rand['R_err'],
+                    'temporal_R':         R_t,
+                    'temporal_r_levels':  r_levels_t,
+                    'temporal_t':         t_full,
+                    'theta_history':      sys_t.theta_history,
+                    't_history':          sys_t.t_history,
+                    'group_id':           viz_group_id,
+                    'omega_means':        omega_means,
+                    })
+
+
+# ============================================================================
 # Main
 # ============================================================================
 
 DISPATCH = {0: run_tipo0, 1: run_tipo1, 2: run_tipo2,
-            3: run_tipo3, 4: run_tipo4}
+            3: run_tipo3, 4: run_tipo4, 5: run_tipo5}
 SUBDIR   = {0: 'tipo0_campo_medio',     1: 'tipo1_modular',
             2: 'tipo2_jerarquico',      3: 'tipo3_conectoma',
-            4: 'tipo4_conectoma_pesado'}
+            4: 'tipo4_conectoma_pesado',
+            5: 'tipo5_dinamica_cerebral'}
 
 
 def main():

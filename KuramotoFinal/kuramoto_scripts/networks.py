@@ -46,6 +46,51 @@ def generar_ICs_por_sigma(n_sigmas, n_runs, N, sigmas, seed=None):
     return omegas_IC, thetas_IC
 
 
+def generar_ICs_por_grupos(n_runs, N, group_id, omega_means, omega_intra_sigma,
+                            seed=None):
+    """ICs con frecuencias intrinsecas distintas por grupo.
+
+    Cada oscilador i se asigna a un grupo g = group_id[i]. Su omega_i se
+    muestrea de N(omega_means[g], omega_intra_sigma^2). Las theta_0 siguen
+    siendo uniformes en [-pi, pi].
+
+    Util para simular el cerebro: distintas regiones tienen frecuencias
+    caracteristicas (por hemisferio, por lobulo, por banda fisiologica).
+
+    Parametros
+    ----------
+    n_runs : int
+    N : int
+    group_id : (N,) int
+        Indice de grupo de cada oscilador. Valores 0..G-1.
+    omega_means : (G,) float
+        Frecuencia media de cada grupo.
+    omega_intra_sigma : float
+        Dispersion dentro de cada grupo (la misma para todos).
+
+    Devuelve
+    --------
+    omegas_IC : (n_runs, N) float
+    thetas_IC : (n_runs, N) float
+    """
+    rng = np.random.default_rng(seed)
+    group_id = np.asarray(group_id, dtype=np.int64)
+    omega_means = np.asarray(omega_means, dtype=np.float64)
+    G = int(group_id.max()) + 1
+    if len(omega_means) != G:
+        raise ValueError(f"omega_means tiene {len(omega_means)} valores pero "
+                         f"hay {G} grupos en group_id.")
+
+    omegas_IC = np.zeros((n_runs, N), dtype=np.float64)
+    for r in range(n_runs):
+        for i in range(N):
+            g = int(group_id[i])
+            omegas_IC[r, i] = rng.normal(omega_means[g], omega_intra_sigma)
+
+    thetas_IC = rng.uniform(-np.pi, np.pi, size=(n_runs, N))
+    return omegas_IC, thetas_IC
+
+
 # ----------------------------------------------------------------------------
 # Helper: añadir aristas aleatorias distintas entre dos conjuntos de nodos
 # ----------------------------------------------------------------------------

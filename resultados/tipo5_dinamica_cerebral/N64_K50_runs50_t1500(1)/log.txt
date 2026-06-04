@@ -1,0 +1,166 @@
+Log de ejecucion - 2026-06-04 09:16:56
+============================================================
+
+sim_type = 5  (tipo5_dinamica_cerebral)
+Resultados: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo5_dinamica_cerebral\N64_K50_runs50_t1500(1)
+
+Conectoma preparado: matriz real
+  shape=(90, 90), max(W)=0.4496, max(strength)=1.32
+omega_mode: per_lobe; grupos=['frontal', 'insular_limbico', 'occipital', 'parietal', 'subcortical', 'temporal']; omega_means=[1.5, 0.7, 1.0, 1.0, 0.9, 0.8]
+
+--- (2/4) Barrido CONECTOMA ---
+Barrido: 1 sigmas x 50 K x 50 runs = 2500 simulaciones
+  Niveles: 1  (grupos por nivel: [6])
+  Parada: block_size=1000, conv_threshold=0.001, max_steps=60000
+  Workers (n_jobs): 16
+
+Lanzando 2500 simulaciones en paralelo...
+[Parallel(n_jobs=16)]: Using backend LokyBackend with 16 concurrent workers.
+[Parallel(n_jobs=16)]: Done   9 tasks      | elapsed:    4.3s
+[Parallel(n_jobs=16)]: Done  18 tasks      | elapsed:    7.1s
+[Parallel(n_jobs=16)]: Done  29 tasks      | elapsed:    8.5s
+[Parallel(n_jobs=16)]: Done  40 tasks      | elapsed:   10.0s
+[Parallel(n_jobs=16)]: Done  53 tasks      | elapsed:   13.6s
+[Parallel(n_jobs=16)]: Done  66 tasks      | elapsed:   15.3s
+[Parallel(n_jobs=16)]: Done  81 tasks      | elapsed:   19.5s
+[Parallel(n_jobs=16)]: Done  96 tasks      | elapsed:   22.2s
+[Parallel(n_jobs=16)]: Done 113 tasks      | elapsed:   25.5s
+[Parallel(n_jobs=16)]: Done 130 tasks      | elapsed:   29.9s
+[Parallel(n_jobs=16)]: Done 149 tasks      | elapsed:   34.1s
+[Parallel(n_jobs=16)]: Done 168 tasks      | elapsed:   39.9s
+[Parallel(n_jobs=16)]: Done 189 tasks      | elapsed:   43.8s
+[Parallel(n_jobs=16)]: Done 210 tasks      | elapsed:   48.7s
+[Parallel(n_jobs=16)]: Done 233 tasks      | elapsed:   54.2s
+[Parallel(n_jobs=16)]: Done 256 tasks      | elapsed:  1.0min
+[Parallel(n_jobs=16)]: Done 281 tasks      | elapsed:  1.1min
+[Parallel(n_jobs=16)]: Done 306 tasks      | elapsed:  1.2min
+[Parallel(n_jobs=16)]: Done 333 tasks      | elapsed:  1.3min
+[Parallel(n_jobs=16)]: Done 360 tasks      | elapsed:  1.4min
+[Parallel(n_jobs=16)]: Done 389 tasks      | elapsed:  1.5min
+[Parallel(n_jobs=16)]: Done 418 tasks      | elapsed:  1.6min
+[Parallel(n_jobs=16)]: Done 449 tasks      | elapsed:  1.7min
+[Parallel(n_jobs=16)]: Done 480 tasks      | elapsed:  1.9min
+[Parallel(n_jobs=16)]: Done 513 tasks      | elapsed:  2.0min
+[Parallel(n_jobs=16)]: Done 546 tasks      | elapsed:  2.2min
+[Parallel(n_jobs=16)]: Done 581 tasks      | elapsed:  2.4min
+[Parallel(n_jobs=16)]: Done 616 tasks      | elapsed:  2.5min
+[Parallel(n_jobs=16)]: Done 653 tasks      | elapsed:  2.7min
+[Parallel(n_jobs=16)]: Done 690 tasks      | elapsed:  2.8min
+[Parallel(n_jobs=16)]: Done 729 tasks      | elapsed:  3.0min
+[Parallel(n_jobs=16)]: Done 768 tasks      | elapsed:  3.2min
+[Parallel(n_jobs=16)]: Done 809 tasks      | elapsed:  3.4min
+[Parallel(n_jobs=16)]: Done 850 tasks      | elapsed:  3.6min
+[Parallel(n_jobs=16)]: Done 893 tasks      | elapsed:  3.8min
+[Parallel(n_jobs=16)]: Done 936 tasks      | elapsed:  3.9min
+[Parallel(n_jobs=16)]: Done 981 tasks      | elapsed:  4.2min
+[Parallel(n_jobs=16)]: Done 1026 tasks      | elapsed:  4.4min
+[Parallel(n_jobs=16)]: Done 1073 tasks      | elapsed:  4.6min
+[Parallel(n_jobs=16)]: Done 1120 tasks      | elapsed:  4.8min
+[Parallel(n_jobs=16)]: Done 1169 tasks      | elapsed:  5.0min
+[Parallel(n_jobs=16)]: Done 1218 tasks      | elapsed:  5.2min
+[Parallel(n_jobs=16)]: Done 1269 tasks      | elapsed:  5.5min
+[Parallel(n_jobs=16)]: Done 1320 tasks      | elapsed:  5.7min
+[Parallel(n_jobs=16)]: Done 1373 tasks      | elapsed:  6.0min
+[Parallel(n_jobs=16)]: Done 1426 tasks      | elapsed:  6.2min
+[Parallel(n_jobs=16)]: Done 1481 tasks      | elapsed:  6.5min
+[Parallel(n_jobs=16)]: Done 1536 tasks      | elapsed:  6.7min
+[Parallel(n_jobs=16)]: Done 1593 tasks      | elapsed:  6.8min
+[Parallel(n_jobs=16)]: Done 1650 tasks      | elapsed:  6.8min
+[Parallel(n_jobs=16)]: Done 1709 tasks      | elapsed:  6.8min
+[Parallel(n_jobs=16)]: Done 1768 tasks      | elapsed:  6.8min
+[Parallel(n_jobs=16)]: Done 1829 tasks      | elapsed:  6.8min
+[Parallel(n_jobs=16)]: Done 1890 tasks      | elapsed:  6.8min
+[Parallel(n_jobs=16)]: Done 1953 tasks      | elapsed:  6.9min
+[Parallel(n_jobs=16)]: Done 2016 tasks      | elapsed:  6.9min
+[Parallel(n_jobs=16)]: Done 2081 tasks      | elapsed:  6.9min
+[Parallel(n_jobs=16)]: Done 2146 tasks      | elapsed:  6.9min
+[Parallel(n_jobs=16)]: Done 2213 tasks      | elapsed:  6.9min
+[Parallel(n_jobs=16)]: Done 2280 tasks      | elapsed:  6.9min
+[Parallel(n_jobs=16)]: Done 2349 tasks      | elapsed:  6.9min
+[Parallel(n_jobs=16)]: Done 2418 tasks      | elapsed:  7.0min
+[Parallel(n_jobs=16)]: Done 2500 out of 2500 | elapsed:  7.0min finished
+Tiempo del barrido: 7.0 min
+
+
+--- (2/4) Barrido ALEATORIA (misma strength) ---
+Barrido: 1 sigmas x 50 K x 50 runs = 2500 simulaciones
+  Niveles: 1  (grupos por nivel: [6])
+  Parada: block_size=1000, conv_threshold=0.001, max_steps=60000
+  Workers (n_jobs): 16
+
+Lanzando 2500 simulaciones en paralelo...
+[Parallel(n_jobs=16)]: Using backend LokyBackend with 16 concurrent workers.
+[Parallel(n_jobs=16)]: Batch computation too fast (0.19393134117126465s.) Setting batch_size=2.
+[Parallel(n_jobs=16)]: Done   9 tasks      | elapsed:    1.0s
+[Parallel(n_jobs=16)]: Done  18 tasks      | elapsed:    3.5s
+[Parallel(n_jobs=16)]: Done  29 tasks      | elapsed:    6.2s
+[Parallel(n_jobs=16)]: Batch computation too slow (7.480491638183594s.) Setting batch_size=1.
+[Parallel(n_jobs=16)]: Done  48 tasks      | elapsed:   12.1s
+[Parallel(n_jobs=16)]: Done  73 tasks      | elapsed:   17.6s
+[Parallel(n_jobs=16)]: Done  93 tasks      | elapsed:   20.5s
+[Parallel(n_jobs=16)]: Done 113 tasks      | elapsed:   25.0s
+[Parallel(n_jobs=16)]: Done 128 tasks      | elapsed:   27.1s
+[Parallel(n_jobs=16)]: Done 145 tasks      | elapsed:   30.0s
+[Parallel(n_jobs=16)]: Done 162 tasks      | elapsed:   34.8s
+[Parallel(n_jobs=16)]: Done 181 tasks      | elapsed:   38.5s
+[Parallel(n_jobs=16)]: Done 200 tasks      | elapsed:   42.8s
+[Parallel(n_jobs=16)]: Done 221 tasks      | elapsed:   48.1s
+[Parallel(n_jobs=16)]: Done 242 tasks      | elapsed:   52.4s
+[Parallel(n_jobs=16)]: Done 265 tasks      | elapsed:   57.4s
+[Parallel(n_jobs=16)]: Done 288 tasks      | elapsed:  1.1min
+[Parallel(n_jobs=16)]: Done 313 tasks      | elapsed:  1.2min
+[Parallel(n_jobs=16)]: Done 338 tasks      | elapsed:  1.3min
+[Parallel(n_jobs=16)]: Done 365 tasks      | elapsed:  1.4min
+[Parallel(n_jobs=16)]: Done 392 tasks      | elapsed:  1.5min
+[Parallel(n_jobs=16)]: Done 421 tasks      | elapsed:  1.6min
+[Parallel(n_jobs=16)]: Done 450 tasks      | elapsed:  1.7min
+[Parallel(n_jobs=16)]: Done 481 tasks      | elapsed:  1.8min
+[Parallel(n_jobs=16)]: Done 512 tasks      | elapsed:  2.0min
+[Parallel(n_jobs=16)]: Done 545 tasks      | elapsed:  2.1min
+[Parallel(n_jobs=16)]: Done 578 tasks      | elapsed:  2.3min
+[Parallel(n_jobs=16)]: Done 613 tasks      | elapsed:  2.4min
+[Parallel(n_jobs=16)]: Done 648 tasks      | elapsed:  2.6min
+[Parallel(n_jobs=16)]: Done 685 tasks      | elapsed:  2.8min
+[Parallel(n_jobs=16)]: Done 722 tasks      | elapsed:  2.9min
+[Parallel(n_jobs=16)]: Done 761 tasks      | elapsed:  3.1min
+[Parallel(n_jobs=16)]: Done 800 tasks      | elapsed:  3.3min
+[Parallel(n_jobs=16)]: Done 841 tasks      | elapsed:  3.5min
+[Parallel(n_jobs=16)]: Done 882 tasks      | elapsed:  3.6min
+[Parallel(n_jobs=16)]: Done 925 tasks      | elapsed:  3.8min
+[Parallel(n_jobs=16)]: Done 968 tasks      | elapsed:  3.9min
+[Parallel(n_jobs=16)]: Done 1013 tasks      | elapsed:  4.1min
+[Parallel(n_jobs=16)]: Done 1058 tasks      | elapsed:  4.2min
+[Parallel(n_jobs=16)]: Done 1105 tasks      | elapsed:  4.4min
+[Parallel(n_jobs=16)]: Done 1152 tasks      | elapsed:  4.4min
+[Parallel(n_jobs=16)]: Done 1201 tasks      | elapsed:  4.5min
+[Parallel(n_jobs=16)]: Done 1250 tasks      | elapsed:  4.5min
+[Parallel(n_jobs=16)]: Done 1301 tasks      | elapsed:  4.6min
+[Parallel(n_jobs=16)]: Done 1352 tasks      | elapsed:  4.6min
+[Parallel(n_jobs=16)]: Done 1405 tasks      | elapsed:  4.6min
+[Parallel(n_jobs=16)]: Done 1458 tasks      | elapsed:  4.6min
+[Parallel(n_jobs=16)]: Done 1513 tasks      | elapsed:  4.6min
+[Parallel(n_jobs=16)]: Done 1568 tasks      | elapsed:  4.6min
+[Parallel(n_jobs=16)]: Done 1625 tasks      | elapsed:  4.6min
+[Parallel(n_jobs=16)]: Done 1682 tasks      | elapsed:  4.6min
+[Parallel(n_jobs=16)]: Done 1741 tasks      | elapsed:  4.7min
+[Parallel(n_jobs=16)]: Done 1800 tasks      | elapsed:  4.7min
+[Parallel(n_jobs=16)]: Done 1861 tasks      | elapsed:  4.7min
+[Parallel(n_jobs=16)]: Done 1922 tasks      | elapsed:  4.7min
+[Parallel(n_jobs=16)]: Done 1985 tasks      | elapsed:  4.7min
+[Parallel(n_jobs=16)]: Done 2048 tasks      | elapsed:  4.7min
+[Parallel(n_jobs=16)]: Done 2113 tasks      | elapsed:  4.7min
+[Parallel(n_jobs=16)]: Done 2178 tasks      | elapsed:  4.8min
+[Parallel(n_jobs=16)]: Done 2245 tasks      | elapsed:  4.8min
+[Parallel(n_jobs=16)]: Done 2312 tasks      | elapsed:  4.8min
+[Parallel(n_jobs=16)]: Done 2381 tasks      | elapsed:  4.8min
+[Parallel(n_jobs=16)]: Done 2450 tasks      | elapsed:  4.8min
+[Parallel(n_jobs=16)]: Done 2500 out of 2500 | elapsed:  4.8min finished
+Tiempo del barrido: 4.8 min
+
+
+--- (3/4) K_meta detectado: K=2.807, sigma_R=0.2633 ---
+--- (4/4) Simulacion temporal a K_meta: 24000 pasos = 600 u.t., snapshots cada 25 pasos ---
+  guardados 960 snapshots de theta
+  animacion: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo5_dinamica_cerebral\N64_K50_runs50_t1500(1)\phase_evolution.mp4
+
+Listo en 13.7 min. Resultados en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo5_dinamica_cerebral\N64_K50_runs50_t1500(1)

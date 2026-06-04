@@ -454,28 +454,40 @@ def plot_hierarchical(K_grid, out, module_id, submodule_id, N, n_runs, save_dir)
 
 def plot_connectome(K_grid, out_conn, out_rand, N, n_runs, save_dir,
                     hemi_labels=('izq', 'der')):
+    """hemi_labels: tupla/lista con los nombres de los grupos del nivel 0.
+    Si tiene 2 entradas se llama 'hemisferios' en titulos; si tiene mas se
+    asume que son lobulos u otra agrupacion arbitraria.
+    """
     setup_plot_style()
     K = K_grid[0]
 
-    # --- Figura 1: R global + r por hemisferio (conectoma) ---
+    # --- Figura 1: R global + r por grupo (conectoma) ---
     R_mean, R_sigma, R_err = out_conn['R_mean'][0], out_conn['R_sigma'][0], out_conn['R_err'][0]
     hemi = out_conn['levels'][0]
+    n_grupos = hemi['rm_mean'][0].shape[-1]
+    if len(hemi_labels) != n_grupos:
+        # Sanidad: si las etiquetas no encajan con el numero de grupos,
+        # generamos genericas para que el plot no falle.
+        hemi_labels = tuple(f'g{i+1}' for i in range(n_grupos))
+    es_hemi = (n_grupos == 2)
+    nombre_grupo = 'hemisferios' if es_hemi else 'grupos'
+
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(15, 5.2))
 
-    labels = [fr'$\langle r_{{{h}}}\rangle$' for h in hemi_labels]
+    labels = [fr'$\langle r_{{\rm {h}}}\rangle$' for h in hemi_labels]
     _draw_groups(a1, K, hemi['rm_mean'][0], hemi['rm_err'][0], labels, log_x=True)
     _draw_global_R(a1, K, R_mean, R_err, log_x=True)
     _set_K_axis(a1, log_x=True)
     a1.set_ylabel('Parametros de orden'); a1.set_ylim(-0.02, 1.02)
-    a1.set_title('Conectoma: global y hemisferios')
-    a1.legend(loc='lower right')
+    a1.set_title(f'Conectoma: global y {nombre_grupo}')
+    a1.legend(loc='lower right', fontsize=8)
     _info_box(a1, fr'$N={N}$, runs$={n_runs}$', 'bottom')
 
     for h in range(hemi['rm_sigma'].shape[-1]):
         a2.plot(K, hemi['rm_sigma'][0][:, h], 'o', ms=3)
         xs, ys = _smooth(K, hemi['rm_sigma'][0][:, h], log_x=True)
         a2.plot(xs, ys, '-', lw=1.2,
-                label=fr'$\sigma_{{r_{{{hemi_labels[h]}}}}}$')
+                label=fr'$\sigma_{{r_{{\rm {hemi_labels[h]}}}}}$')
     a2.plot(K, R_sigma, 'o', ms=4, color='k')
     xs, ys = _smooth(K, R_sigma, log_x=True)
     a2.plot(xs, ys, '-', lw=1.8, color='k', label=r'$\sigma_R$ (global)')
@@ -580,3 +592,197 @@ def plot_matriz_adyacencia(A, group_id=None, save_path=None, titulo=None):
         fig.savefig(save_path, dpi=120, bbox_inches='tight')
     plt.close(fig)
     return save_path
+
+
+# ============================================================================
+# sim_type 5: dinamica cerebral, plots temporales y animacion de fase
+# ============================================================================
+
+def plot_R_temporal(t, R, r_levels=None, K_meta=None, save_path=None,
+                    group_names=None):
+    """Evolucion temporal del parametro de orden global R(t) y opcionalmente
+    los r de cada grupo (p.ej. r_hemi_izq(t), r_hemi_der(t)).
+
+    Si R(t) oscila visiblemente, estamos en regimen metaestable. Si converge
+    a una constante alta -> sincronizacion. Si fluctua cerca de 0 -> incoherente.
+
+    Parametros
+    ----------
+    t          : (n_steps,)  vector de tiempos.
+    R          : (n_steps,)  parametro de orden global.
+    r_levels   : (n_groups, n_steps) o None. Si dado, dibuja los grupos.
+    K_meta     : float o None. Si dado, aparece en el titulo.
+    group_names : lista de nombres para la leyenda de los grupos.
+    """
+    setup_plot_style()
+    fig, ax = plt.subplots(figsize=(11, 4.8))
+
+    if r_levels is not None and r_levels.shape[0] > 0:
+        n_grupos = r_levels.shape[0]
+        colors = plt.cm.viridis(np.linspace(0.15, 0.85, n_grupos))
+        for g in range(n_grupos):
+            etiqueta = (group_names[g] if group_names and g < len(group_names)
+                        else f'grupo {g+1}')
+            ax.plot(t, r_levels[g], lw=0.7, alpha=0.7, color=colors[g],
+                    label=fr'$r_{{{etiqueta}}}(t)$')
+
+    ax.plot(t, R, lw=1.2, color='k', label=r'$R(t)$ (global)')
+
+    ax.set_xlim(t[0], t[-1])
+    ax.set_ylim(-0.02, 1.02)
+    ax.set_xlabel('Tiempo $t$ (u.t.)')
+    ax.set_ylabel('Parametro de orden')
+    titulo = r'Evolucion temporal del parametro de orden'
+    if K_meta is not None:
+        titulo += rf' (K $=$ {K_meta:.3g}, regimen metaestable)'
+    ax.set_title(titulo)
+    ax.legend(loc='center left', bbox_to_anchor=(1.02, 0.5),
+          ncol=1, frameon=True)
+    fig.tight_layout()
+    if save_path is not None:
+        fig.savefig(save_path)
+    plt.close(fig)
+    return save_path
+
+
+def plot_phase_snapshots(theta_history, t_history, group_id, save_path=None,
+                          n_panels=6, group_names=None, K_meta=None):
+    """6 paneles (por defecto) en proyeccion polar mostrando todos los
+    osciladores como puntos en un circulo unidad, distribuidos uniformemente
+    en t = t_0, t_T/5, 2T/5, ..., T.
+
+    Cada punto en angulo theta_i(t) y radio = 1. Se colorea por grupo
+    (hemisferio o lobulo) para ver clusters dinamicos.
+
+    La idea visual: clusters de puntos juntos = grupo sincronizado.
+    Puntos repartidos por todo el circulo = grupo incoherente. En regimen
+    metaestable se ve a los grupos formar y deshacer clusters a lo largo
+    del tiempo.
+    """
+    setup_plot_style()
+    n_t = theta_history.shape[0]
+    indices = np.linspace(0, n_t - 1, n_panels).astype(int)
+
+    n_grupos = int(np.asarray(group_id).max()) + 1
+    colors = plt.cm.viridis(np.linspace(0.15, 0.85, n_grupos))
+    cols = (n_panels + 1) // 2
+    rows = 2 if n_panels > 1 else 1
+    fig, axes = plt.subplots(rows, cols, figsize=(3.5*cols, 3.5*rows),
+                              subplot_kw={'projection': 'polar'})
+    axes_flat = np.atleast_1d(axes).flatten()
+
+    for k, idx in enumerate(indices):
+        ax = axes_flat[k]
+        theta = theta_history[idx]
+        # Punto por nodo, coloreado por grupo, radio constante = 1.
+        for g in range(n_grupos):
+            mask = (group_id == g)
+            etiqueta = (group_names[g] if group_names and g < len(group_names)
+                        else f'g{g}')
+            ax.plot(theta[mask], np.ones(mask.sum()), 'o',
+                    ms=4, color=colors[g], alpha=0.85,
+                    label=etiqueta if k == 0 else None)
+        ax.set_yticklabels([])
+        ax.set_ylim(0, 1.1)
+        ax.set_title(rf't $=$ {t_history[idx]:.1f}', fontsize=10)
+        ax.grid(alpha=0.3)
+
+    # Esconder ejes sobrantes si hay menos paneles que celdas.
+    for k in range(n_panels, len(axes_flat)):
+        axes_flat[k].set_visible(False)
+
+    # Leyenda comun arriba.
+    if n_grupos <= 8:
+        fig.legend(handles=axes_flat[0].get_legend_handles_labels()[0],
+           labels=axes_flat[0].get_legend_handles_labels()[1],
+           loc='lower center', bbox_to_anchor=(0.5, -0.02),
+           ncol=min(n_grupos, 6), fontsize=10, frameon=False)
+
+    titulo = 'Snapshots de fase (proyeccion polar)'
+    if K_meta is not None:
+        titulo += rf'  -  $K = ${K_meta:.3g}'
+    fig.suptitle(titulo, fontsize=12, y=1.00)
+    fig.tight_layout()
+    if save_path is not None:
+        fig.savefig(save_path)
+    plt.close(fig)
+    return save_path
+
+
+def animate_phase_evolution(theta_history, t_history, group_id, save_path,
+                              group_names=None, K_meta=None, fps=30,
+                              max_frames=1200):
+    """Anima la evolucion de las fases en proyeccion polar y la guarda como
+    MP4 (con ffmpeg) o GIF (con Pillow, fallback si no hay ffmpeg).
+
+    Cada frame muestra los osciladores como puntos en un circulo unidad
+    en su angulo theta_i(t). Se ven los clusters formandose y deshaciendose.
+
+    Parametros
+    ----------
+    theta_history : (n_t, N)
+    t_history    : (n_t,)
+    group_id     : (N,) int
+    save_path    : ruta de salida (.mp4 o .gif segun extension)
+    fps          : frames por segundo del video
+    max_frames   : limite duro de frames (submuestrea si hay mas).
+    """
+    import matplotlib.animation as mpla
+
+    setup_plot_style()
+    n_t = theta_history.shape[0]
+    if n_t > max_frames:
+        # Submuestreo uniforme.
+        step = n_t // max_frames
+        theta_history = theta_history[::step]
+        t_history    = t_history[::step]
+        n_t = theta_history.shape[0]
+
+    n_grupos = int(np.asarray(group_id).max()) + 1
+    colors = plt.cm.viridis(np.linspace(0.15, 0.85, n_grupos))
+    fig, ax = plt.subplots(figsize=(6, 6), subplot_kw={'projection': 'polar'})
+
+    # Un scatter por grupo (ahorrar redraws).
+    scatters = []
+    for g in range(n_grupos):
+        mask = (group_id == g)
+        etiqueta = (group_names[g] if group_names and g < len(group_names)
+                    else f'g{g}')
+        sc = ax.plot([], [], 'o', ms=5, color=colors[g], alpha=0.85,
+                     label=etiqueta)[0]
+        scatters.append((sc, mask))
+
+    ax.set_yticklabels([])
+    ax.set_ylim(0, 1.1)
+    ax.grid(alpha=0.3)
+    ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.12),
+              ncol=min(n_grupos, 4), fontsize=9, frameon=False)
+    titulo_base = 'Evolucion de fases'
+    if K_meta is not None:
+        titulo_base += rf'  ($K = ${K_meta:.3g})'
+
+    def update(k):
+        theta = theta_history[k]
+        for sc, mask in scatters:
+            sc.set_data(theta[mask], np.ones(mask.sum()))
+        ax.set_title(rf'{titulo_base}    t $=$ {t_history[k]:.1f}',
+                     fontsize=11)
+        return [s for s, _ in scatters]
+
+    ani = mpla.FuncAnimation(fig, update, frames=n_t, interval=1000/fps,
+                              blit=False)
+
+    # Guardar: intentamos MP4 con ffmpeg, fallback a GIF con Pillow.
+    save_path_out = save_path
+    try:
+        writer = mpla.FFMpegWriter(fps=fps, bitrate=2500)
+        ani.save(save_path, writer=writer, dpi=130)
+    except Exception as e:
+        # Si no hay ffmpeg, escribimos GIF con Pillow.
+        save_path_out = os.path.splitext(save_path)[0] + '.gif'
+        writer = mpla.PillowWriter(fps=fps)
+        ani.save(save_path_out, writer=writer, dpi=90)
+        print(f"AVISO: ffmpeg no disponible ({type(e).__name__}); "
+              f"guardado como GIF en {save_path_out}")
+    plt.close(fig)
+    return save_path_out
