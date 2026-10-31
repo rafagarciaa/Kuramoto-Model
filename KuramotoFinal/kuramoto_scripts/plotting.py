@@ -453,11 +453,17 @@ def plot_hierarchical(K_grid, out, module_id, submodule_id, N, n_runs, save_dir)
 # ----------------------------------------------------------------------------
 
 def plot_connectome(K_grid, out_conn, out_rand, N, n_runs, save_dir,
-                    hemi_labels=('izq', 'der')):
+                    hemi_labels=('izq', 'der'), approx_label=None):
     """hemi_labels: tupla/lista con los nombres de los grupos del nivel 0.
     Si tiene 2 entradas se llama 'hemisferios' en titulos; si tiene mas se
     asume que son lobulos u otra agrupacion arbitraria.
+
+    approx_label: si se proporciona, etiqueta corta que describe la
+    preparacion de la matriz (p.ej. 'pesos brutos' o 'rejilla 5 niveles
+    (log)'). Aparece en las cajas de informacion de cada panel para que
+    en el .png se vea con que aproximacion se hizo el barrido.
     """
+    info_extra = f', {approx_label}' if approx_label else ''
     setup_plot_style()
     K = K_grid[0]
 
@@ -481,7 +487,7 @@ def plot_connectome(K_grid, out_conn, out_rand, N, n_runs, save_dir,
     a1.set_ylabel('Parametros de orden'); a1.set_ylim(-0.02, 1.02)
     a1.set_title(f'Conectoma: global y {nombre_grupo}')
     a1.legend(loc='lower right', fontsize=8)
-    _info_box(a1, fr'$N={N}$, runs$={n_runs}$', 'bottom')
+    _info_box(a1, fr'$N={N}$, runs$={n_runs}${info_extra}', 'bottom')
 
     for h in range(hemi['rm_sigma'].shape[-1]):
         a2.plot(K, hemi['rm_sigma'][0][:, h], 'o', ms=3)
@@ -494,7 +500,7 @@ def plot_connectome(K_grid, out_conn, out_rand, N, n_runs, save_dir,
     _set_K_axis(a2, log_x=True)
     a2.set_ylabel(r'$\sigma$'); a2.set_title('Metaestabilidad (conectoma)')
     a2.legend(loc='upper right')
-    _info_box(a2, fr'$N={N}$, runs$={n_runs}$', 'top')
+    _info_box(a2, fr'$N={N}$, runs$={n_runs}${info_extra}', 'top')
     fig.tight_layout(); fig.savefig(_ruta(save_dir, 'conectoma.png')); plt.close(fig)
 
     # --- Figura 2: comparacion conectoma vs aleatoria ---
@@ -512,6 +518,7 @@ def plot_connectome(K_grid, out_conn, out_rand, N, n_runs, save_dir,
     a1.set_ylabel(r'$\langle R \rangle$'); a1.set_ylim(-0.02, 1.02)
     a1.set_title(r'$\langle R\rangle$: conectoma vs aleatoria')
     a1.legend(loc='lower right')
+    _info_box(a1, fr'$N={N}$, runs$={n_runs}${info_extra}', 'bottom')
 
     Kc_c = Kc_experimental(K, Sc, log=True)
     Kc_r = Kc_experimental(K, Sr, log=True)
@@ -527,7 +534,7 @@ def plot_connectome(K_grid, out_conn, out_rand, N, n_runs, save_dir,
     a2.set_ylabel(r'$\sigma_R$')
     a2.set_title('Metaestabilidad: conectoma vs aleatoria')
     a2.legend(loc='upper right')
-    _info_box(a2, fr'$N={N}$, runs$={n_runs}$', 'top')
+    _info_box(a2, fr'$N={N}$, runs$={n_runs}${info_extra}', 'top')
     fig.tight_layout(); fig.savefig(_ruta(save_dir, 'comparacion.png')); plt.close(fig)
 
 

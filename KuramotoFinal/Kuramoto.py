@@ -249,7 +249,19 @@ def run_tipo1(p, run_dir):
                                    s1.K_center, ks.K_width_factor)[None, :]
     sigmas = np.array([s1.sigma])
 
-    omegas_IC, thetas_IC = generar_ICs(g.n_runs, g.N, s1.sigma, seed=g.seed)
+    # Si desfase_frecuencia != 0, cada modulo i genera sus omegas con media i*d
+    # (intra-modulo: Gaussiana de anchura sigma). Con d=0 recuperamos el
+    # comportamiento clasico (todas centradas en 0).
+    desfase = float(getattr(s1, 'desfase_frecuencia', 0.0))
+    if desfase != 0.0:
+        omega_means = desfase * np.arange(s1.n_modules, dtype=np.float64)
+        print(f"desfase_frecuencia={desfase}; omega_means por modulo = "
+              f"{omega_means.tolist()}")
+        omegas_IC, thetas_IC = generar_ICs_por_grupos(
+            g.n_runs, g.N, module_id, omega_means,
+            omega_intra_sigma=s1.sigma, seed=g.seed)
+    else:
+        omegas_IC, thetas_IC = generar_ICs(g.n_runs, g.N, s1.sigma, seed=g.seed)
     omegas_IC, thetas_IC = omegas_IC[None, ...], thetas_IC[None, ...]
 
     plot_matriz_adyacencia(As[0], module_id, _ruta(run_dir, 'A.png'),
@@ -379,9 +391,12 @@ def run_tipo4(p, run_dir):
         descripcion = (f"intervalos (n_levels={n_levels}, "
                        f"log_transform={log_transform}; "
                        f"{n_distintos} valores distintos en W)")
+        approx_label = (fr'rejilla {n_levels} niveles'
+                        + (' (log)' if log_transform else ''))
     elif approx == 'matriz_real':
         W = prepare_W_real(ruta_mat)
         descripcion = "matriz real (valores brutos)"
+        approx_label = 'pesos brutos'
     else:
         raise ValueError(f"approximation='{approx}' desconocido. "
                          "Usa 'matriz_real' o 'intervalos'.")
@@ -435,7 +450,8 @@ def run_tipo4(p, run_dir):
                     'rand_R_mean':  out_rand['R_mean'],
                     'rand_R_sigma': out_rand['R_sigma'],
                     'rand_R_err':   out_rand['R_err']})
-    plot_connectome(K_grid, out_conn, out_rand, N, g.n_runs, run_dir)
+    plot_connectome(K_grid, out_conn, out_rand, N, g.n_runs, run_dir,
+                    approx_label=approx_label)
 
 
 # ============================================================================

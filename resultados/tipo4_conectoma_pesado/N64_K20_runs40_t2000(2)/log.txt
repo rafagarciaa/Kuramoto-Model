@@ -1,0 +1,8 @@
+Log de ejecucion - 2026-06-05 19:36:59
+============================================================
+
+sim_type = 4  (tipo4_conectoma_pesado)
+Resultados: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo4_conectoma_pesado\N64_K20_runs40_t2000(2)
+
+Conectoma preparado: matriz real (valores brutos)
+  shape=(90, 90), |E_nonzero|=4004, max(W)=0.4496, max(strength)=1.32

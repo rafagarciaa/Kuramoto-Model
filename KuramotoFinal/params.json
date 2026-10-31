@@ -16,6 +16,7 @@
     "tipo0_mean_field.scaling_fracs": "Fracciones de N a simular cuando scaling=true. Convencion <=1.0.",
     "tipo0_mean_field.fss_method": "Ley de escalado FSS para extrapolar Kc(N) -> Kc_inf. Opciones: 'linear_invN' (alpha=1, lineal en 1/N, sesgado pero estable), 'powerlaw_2_5' (alpha=2/5, Hong 2007, teorico para Kuramoto Gaussiano), 'powerlaw_free' (alpha ajustado a los datos; la tabla reporta el alpha encontrado y su error relativo respecto a 2/5). El plot SIEMPRE muestra los tres plots 1/N, N^(-2/5) y N^alpha; esta opcion solo decide cual Kc_inf es el 'oficial' que se guarda en el .npz.",
     "tipo1_modular": "Red modular de un nivel. n_modules bloques simetricos, densos por dentro.",
+    "tipo1_modular.desfase_frecuencia": "Desfase entre frecuencias medias de modulos consecutivos. Si d != 0, el modulo i genera sus omegas con media i*d (N(i*d, sigma^2)). d=0 -> todas centradas en 0 (comportamiento clasico).",
     "tipo2_hierarchical.submodules_per_module": "Array: cada elemento = nº de submodulos (simetricos) dentro de ese modulo de nivel 1.",
     "tipo3_connectome.mat_file": "Nombre del .mat dentro de ./data/.",
     "tipo3_connectome.threshold": "'auto' = el mas alto que mantiene el grafo conexo; o un float.",
@@ -41,8 +42,8 @@
 
   "general": {
     "N": 64,
-    "dt": 0.025,
-    "n_runs": 10,
+    "dt": 0.005,
+    "n_runs": 50,
     "n_jobs": 16,
     "seed": null
   },
@@ -50,39 +51,40 @@
   "convergence": {
     "block_size": 1000,
     "conv_threshold": 1e-3,
-    "t_max": 1500.0
+    "t_max": 2000.0
   },
 
   "K_sweep": {
-    "n_K": 50,
-    "K_width_factor": 0.2
+    "n_K": 20,
+    "K_width_factor": 0.25
   },
 
   "tipo0_mean_field": {
-    "n_sigmas": 2,
-    "sigma_min": 1,
-    "sigma_max": 1.5,
-    "K_min": 1.25,
-    "K_max": 4.5,
+    "n_sigmas": 3,
+    "sigma_min": 1.0,
+    "sigma_max": 2.0,
+    "K_min": 1.0,
+    "K_max": 5.0,
     "scaling": true,
     "fss_method": "powerlaw_2_5",
     "scaling_fracs": [0.0333, 0.0385, 0.0444, 0.0513, 0.0593, 0.0685, 0.0791, 0.0913, 0.1054, 0.1217, 0.1405, 0.1622, 0.1873, 0.2163, 0.2497, 0.2882, 0.3328, 0.3842, 0.4436, 0.5121, 0.5913, 0.6826, 0.7881, 0.9099, 1.0]
   },
 
   "tipo1_modular": {
-    "n_modules": 4,
+    "n_modules": 2,
     "p_intra": 1.0,
     "n_edges_inter": 1,
     "sigma": 1.0,
+    "desfase_frecuencia": 2.0,
     "K_min": 5e-3,
-    "K_max": null,
+    "K_max": 100,
     "K_center": null
   },
 
   "tipo2_hierarchical": {
-    "submodules_per_module": [3, 2, 4],
+    "submodules_per_module": [3, 2],
     "p_intra_submodule": 1.0,
-    "n_edges_inter_submodule": 1,
+    "n_edges_inter_submodule": 2,
     "n_edges_inter_module": 1,
     "sigma": 1.0,
     "K_min": 5e-3,
@@ -93,7 +95,7 @@
   "tipo3_connectome": {
     "mat_file": "SCmatrices88healthy.mat",
     "threshold": 0.003,
-    "n_swaps_factor": 10,
+    "n_swaps_factor": 50,
     "sigma": 1.0,
     "K_min": 5e-3,
     "K_max": null,
@@ -105,7 +107,7 @@
     "approximation": "matriz_real",
     "n_levels": 5,
     "log_transform": true,
-    "n_swaps_factor": 50,
+    "n_swaps_factor": 100,
     "sigma": 1.0,
     "K_min": 0.1,
     "K_max": null,
@@ -117,7 +119,7 @@
     "approximation": "intervalos",
     "n_levels": 5,
     "log_transform": true,
-    "n_swaps_factor": 40,
+    "n_swaps_factor": 50,
     "sigma": 1.0,
     "K_min": 0.05,
     "K_max": null,
@@ -125,7 +127,7 @@
     "omega_mode": "per_lobe",
     "omega_means": null,
     "omega_intra_sigma": 0.08,
-    "temporal_t_max": 600.0,
+    "temporal_t_max": 300.0,
     "sample_every": 4,
     "viz_groups": "lobes",
     "animate_fps": 30,

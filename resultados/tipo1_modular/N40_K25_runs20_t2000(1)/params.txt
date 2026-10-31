@@ -1,0 +1,22 @@
+Parametros de la ejecucion
+========================================
+sim_type                  = 1
+max_steps                 = 2000000
+general.N                 = 40
+general.dt                = 0.001
+general.n_runs            = 20
+general.n_jobs            = 16
+general.seed              = None
+convergence.block_size    = 1500
+convergence.conv_threshold = 0.001
+convergence.t_max         = 2000.0
+K_sweep.n_K               = 25
+K_sweep.K_width_factor    = 0.25
+tipo1_modular.n_modules   = 2
+tipo1_modular.p_intra     = 1.0
+tipo1_modular.n_edges_inter = 1
+tipo1_modular.sigma       = 1
+tipo1_modular.desfase_frecuencia = 0.03
+tipo1_modular.K_min       = 0.005
+tipo1_modular.K_max       = 100
+tipo1_modular.K_center    = None

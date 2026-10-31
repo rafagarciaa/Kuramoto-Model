@@ -1,0 +1,42 @@
+Log de ejecucion - 2026-06-05 13:45:58
+============================================================
+
+sim_type = 1  (tipo1_modular)
+Resultados: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo1_modular\N40_K25_runs20_t2000(1)
+
+desfase_frecuencia=0.03; omega_means por modulo = [0.0, 0.03]
+Barrido: 1 sigmas x 25 K x 20 runs = 500 simulaciones
+  Niveles: 1  (grupos por nivel: [2])
+  Parada: block_size=1500, conv_threshold=0.001, max_steps=2000000
+  Workers (n_jobs): 16
+
+Lanzando 500 simulaciones en paralelo...
+[Parallel(n_jobs=16)]: Using backend LokyBackend with 16 concurrent workers.
+[Parallel(n_jobs=16)]: Done   9 tasks      | elapsed:    5.0s
+[Parallel(n_jobs=16)]: Done  18 tasks      | elapsed:    5.7s
+[Parallel(n_jobs=16)]: Done  29 tasks      | elapsed:    6.8s
+[Parallel(n_jobs=16)]: Done  40 tasks      | elapsed:    7.9s
+[Parallel(n_jobs=16)]: Done  53 tasks      | elapsed:    9.7s
+[Parallel(n_jobs=16)]: Done  66 tasks      | elapsed:   11.5s
+[Parallel(n_jobs=16)]: Done  81 tasks      | elapsed:   14.2s
+[Parallel(n_jobs=16)]: Done  96 tasks      | elapsed:   16.2s
+[Parallel(n_jobs=16)]: Done 113 tasks      | elapsed:   19.5s
+[Parallel(n_jobs=16)]: Done 130 tasks      | elapsed:   22.8s
+[Parallel(n_jobs=16)]: Done 149 tasks      | elapsed:   27.1s
+[Parallel(n_jobs=16)]: Done 168 tasks      | elapsed:   32.7s
+[Parallel(n_jobs=16)]: Done 189 tasks      | elapsed:   41.0s
+[Parallel(n_jobs=16)]: Done 210 tasks      | elapsed:   51.9s
+[Parallel(n_jobs=16)]: Done 233 tasks      | elapsed:   59.7s
+[Parallel(n_jobs=16)]: Done 256 tasks      | elapsed:  1.1min
+[Parallel(n_jobs=16)]: Done 281 tasks      | elapsed:  1.3min
+[Parallel(n_jobs=16)]: Done 306 tasks      | elapsed:  1.4min
+[Parallel(n_jobs=16)]: Done 333 tasks      | elapsed:  1.5min
+[Parallel(n_jobs=16)]: Done 360 tasks      | elapsed:  1.5min
+[Parallel(n_jobs=16)]: Done 389 tasks      | elapsed:  1.5min
+[Parallel(n_jobs=16)]: Done 418 tasks      | elapsed:  1.5min
+[Parallel(n_jobs=16)]: Done 449 tasks      | elapsed:  1.6min
+[Parallel(n_jobs=16)]: Done 500 out of 500 | elapsed:  1.9min finished
+Tiempo del barrido: 1.9 min
+
+
+Listo en 1.9 min. Resultados en: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo1_modular\N40_K25_runs20_t2000(1)

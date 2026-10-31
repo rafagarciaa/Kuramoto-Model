@@ -1,0 +1,17 @@
+Log de ejecucion - 2026-06-05 13:43:17
+============================================================
+
+sim_type = 1  (tipo1_modular)
+Resultados: C:\Users\Rafa\Desktop\IMPORTANTE_UNIVERSIDAD\Asignaturas\5to\2doCuatri\SistemasComplejos\Kuramoto\resultados\tipo1_modular\N40_K80_runs40_t2000
+
+desfase_frecuencia=0.03; omega_means por modulo = [0.0, 0.03]
+Barrido: 1 sigmas x 80 K x 40 runs = 3200 simulaciones
+  Niveles: 1  (grupos por nivel: [2])
+  Parada: block_size=2000, conv_threshold=0.0005, max_steps=2000000
+  Workers (n_jobs): 16
+
+Lanzando 3200 simulaciones en paralelo...
+[Parallel(n_jobs=16)]: Using backend LokyBackend with 16 concurrent workers.
+[Parallel(n_jobs=16)]: Done   9 tasks      | elapsed:    5.2s
+[Parallel(n_jobs=16)]: Done  18 tasks      | elapsed:    7.4s
+[Parallel(n_jobs=16)]: Done  29 tasks      | elapsed:   13.7s

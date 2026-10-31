@@ -44,3 +44,6 @@ desktop.ini
 *.nav
 *.snm
 *.vrb
+
+# Supera el limite de 100 MB de GitHub; se queda solo en local
+resultados/tipo5_dinamica_cerebral/N64_K20_runs50_t2000/phase_evolution.mp4
